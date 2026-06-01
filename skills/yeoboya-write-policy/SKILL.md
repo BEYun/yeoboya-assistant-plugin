@@ -26,7 +26,7 @@ user-invocable: false
    - Critical 권고 → POL 카탈로그의 새 정책 또는 예외/롤백 카테고리
    - Major 이슈 → 파라미터 표 또는 POL 카탈로그
    - 권고(문서) → 본문 보완 항목으로 흡수
-2. **본문 작성** — `references/policy-template.md` 구조 그대로 8 섹션 (용어/역할/파라미터/정책 카탈로그/예외·롤백/변경 이력/배경/측정 지표/원본 자료).
+2. **본문 작성** — `references/policy-template.md` 구조 그대로 9 섹션 (용어/역할/파라미터/정책 카탈로그/예외·롤백/변경 이력/배경/측정 지표/원본 자료).
    - POL-NNN ID는 등록 순번. 카테고리는 도메인별 자유 정의.
    - 예외·롤백 동작 유형은 template 6종 (Auto-Fallback / Toast Notice / Invalidation / Deferral / Early Settlement / Non-Participation) 외 신규 카테고리 추가 가능.
 3. **변경 이력** — workType=update 또는 재publish 시 §변경 이력에 1행 이상 추가.
