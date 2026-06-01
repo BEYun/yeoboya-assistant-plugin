@@ -10,6 +10,7 @@ This document is the **single source of truth** for state file schemas and share
   "workType": "feature",
   "name": "라이브 방송 검색",
   "stages": {
+    "write-policy-feedback": { "status": "todo" },
     "write-policy":   { "status": "published", "notionPageId": "abc..." },
     "write-domain":   { "status": "todo" },
     "draw-ui-flow":   { "status": "todo" },
@@ -26,7 +27,9 @@ This document is the **single source of truth** for state file schemas and share
 
 - `workType` ∈ {`feature`, `update`, `bugfix`}
 - `status` ∈ {`todo`, `done`, `published`, `skipped`}
-- `notionPageId`: present iff `status === "published"`
+- `notionPageId`: present iff `status === "published"` and stage produces 1 page
+- `notionPageIds`: object form, present iff `status === "published"` and stage produces N pages (e.g. `draw-data-flow`)
+  - Shape: `{ "<페이지 제목>": "<pageId>" }`
 - `referenceTask`: present only when `workType === "update"` and a reference task was chosen
 
 ## 2. `.workflow/<작업번호>/code-phases.json`
@@ -71,26 +74,36 @@ Notion MCP is a required prerequisite for v2; there is no `notion.mode` field.
 
 ```
 STAGE_ORDER = [
+  "write-policy-feedback",
   "write-policy", "write-domain", "draw-ui-flow", "draw-data-flow",
   "write-code", "fix-bug",
   "review-code", "write-qa", "fix-qa-bug", "finish-work"
 ]
 
 WORKTYPE_STAGES = {
-  feature: ["write-policy", "write-domain", "draw-ui-flow", "draw-data-flow",
+  feature: ["write-policy-feedback", "write-policy", "write-domain",
+            "draw-ui-flow", "draw-data-flow",
             "write-code", "review-code", "write-qa", "fix-qa-bug", "finish-work"],
-  update:  ["write-policy", "write-domain", "draw-ui-flow", "draw-data-flow",
+  update:  ["write-policy-feedback", "write-policy", "write-domain",
+            "draw-ui-flow", "draw-data-flow",
             "write-code", "review-code", "write-qa", "fix-qa-bug", "finish-work"],
   bugfix:  ["fix-bug", "review-code", "write-qa", "fix-qa-bug", "finish-work"]
 }
 
-NOTION_STAGES = ["write-policy", "write-domain", "draw-ui-flow", "draw-data-flow", "write-qa"]
+NOTION_STAGES = [
+  "write-policy-feedback", "write-policy", "write-domain",
+  "draw-ui-flow", "draw-data-flow", "write-qa"
+]
 
-UPDATE_OPTIONAL_STAGES = ["write-policy", "write-domain", "draw-ui-flow", "draw-data-flow"]
+UPDATE_OPTIONAL_STAGES = [
+  "write-policy-feedback", "write-policy", "write-domain",
+  "draw-ui-flow", "draw-data-flow"
+]
 
 CODE_PHASES = ["data", "domain", "presentation"]
 
 STAGE_LABELS = {
+  "write-policy-feedback": "기획서 검토",
   "write-policy":   "정책서 작성",
   "write-domain":   "도메인 명세서",
   "draw-ui-flow":   "UI 흐름도",
@@ -104,15 +117,30 @@ STAGE_LABELS = {
 }
 
 STAGE_TITLE_TO_KEY = {
+  "기획서 검토":     "write-policy-feedback",
   "정책서":          "write-policy",
   "도메인 명세서":   "write-domain",
   "UI 흐름도":       "draw-ui-flow",
   "데이터 흐름도":   "draw-data-flow",
+  "통신 명세서":     "draw-data-flow",
   "QA 시나리오":     "write-qa"
 }
+
+WORKTYPE_LABEL = {
+  feature: "신규 개발",
+  update:  "변경/고도화",
+  bugfix:  "버그 수정"
+}
+
+TASK_STATE_ORDER = [
+  "시작 전", "기획 단계", "설계 단계",
+  "개발 단계", "테스트 단계", "완료"
+]
 ```
 
-`STAGE_TITLE_TO_KEY` is used by `notion-page-record` hook to resolve which stage a Notion page belongs to from its title. Only NOTION_STAGES appear here.
+`STAGE_TITLE_TO_KEY`는 `notion-page-record` hook에서 페이지 제목 → stage 추론에 쓰인다. `draw-data-flow`는 두 페이지("데이터 흐름도", "통신 명세서")가 같은 stage 키로 매핑되며, hook은 두 페이지 모두 published될 때만 stage status를 published로 flip한다.
+
+`WORKTYPE_LABEL`은 `start-work`에서 작업 유형 select 값 결정에 쓰인다. `TASK_STATE_ORDER`는 `notion-page-record` hook의 forward-only 판정에 쓰인다.
 
 ## 5. Read/write conventions
 
