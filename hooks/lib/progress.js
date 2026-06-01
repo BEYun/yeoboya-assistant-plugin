@@ -63,12 +63,30 @@ function safeWriteProgress(root, task, progress) {
   }
 }
 
-function markStagePublished(root, task, stage, notionPageId) {
+function markStagePublished(root, task, stage, notionPageId, multi) {
   const p = readProgress(root, task);
   if (!p || !p.stages || !p.stages[stage]) return false;
-  if (p.stages[stage].status !== 'done') return false;
-  p.stages[stage].status = 'published';
-  p.stages[stage].notionPageId = notionPageId;
+  const cell = p.stages[stage];
+
+  // Single-page path (backward-compatible)
+  if (!multi || !multi.title) {
+    if (cell.status !== 'done') return false;
+    cell.status = 'published';
+    cell.notionPageId = notionPageId;
+    return safeWriteProgress(root, task, p);
+  }
+
+  // Multi-page path
+  const { title, requiredTitles } = multi;
+  if (!Array.isArray(requiredTitles) || !requiredTitles.includes(title)) return false;
+  if (cell.status !== 'done' && cell.status !== 'published') return false;
+
+  cell.notionPageIds = cell.notionPageIds || {};
+  cell.notionPageIds[title] = notionPageId;
+
+  const allPresent = requiredTitles.every((t) => cell.notionPageIds[t]);
+  if (allPresent && cell.status !== 'published') cell.status = 'published';
+
   return safeWriteProgress(root, task, p);
 }
 
