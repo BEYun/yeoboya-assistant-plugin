@@ -89,3 +89,57 @@ test('does not flip when current stage status is not done (e.g., still todo)', (
   const after = JSON.parse(fs.readFileSync(pgFile, 'utf8'));
   assert.equal(after.stages['write-policy'].status, 'todo');
 });
+
+test('multi-page stage — 첫 페이지(데이터 흐름도) publish → done 유지 + notionPageIds 부착', () => {
+  const root = tmpRoot();
+  const pgFile = setupTask(root, { 'draw-data-flow': { status: 'done' } });
+
+  const inp = createPagesPayload([{ title: '데이터 흐름도', markdown: '...' }]);
+  const result = runHook(root, {
+    ...inp,
+    tool_response: createPagesResponse(['p-dataflow']),
+  });
+
+  assert.equal(result.status, 0);
+  const after = JSON.parse(fs.readFileSync(pgFile, 'utf8'));
+  assert.equal(after.stages['draw-data-flow'].status, 'done');
+  assert.deepEqual(after.stages['draw-data-flow'].notionPageIds, { '데이터 흐름도': 'p-dataflow' });
+});
+
+test('multi-page stage — 두 번째 페이지(통신 명세서) publish → published flip', () => {
+  const root = tmpRoot();
+  const pgFile = setupTask(root, {
+    'draw-data-flow': {
+      status: 'done',
+      notionPageIds: { '데이터 흐름도': 'p-dataflow' }
+    }
+  });
+
+  const inp = createPagesPayload([{ title: '통신 명세서', markdown: '...' }]);
+  runHook(root, {
+    ...inp,
+    tool_response: createPagesResponse(['p-comm']),
+  });
+
+  const after = JSON.parse(fs.readFileSync(pgFile, 'utf8'));
+  assert.equal(after.stages['draw-data-flow'].status, 'published');
+  assert.deepEqual(after.stages['draw-data-flow'].notionPageIds, {
+    '데이터 흐름도': 'p-dataflow',
+    '통신 명세서': 'p-comm',
+  });
+});
+
+test('기획서 검토 page → write-policy-feedback published', () => {
+  const root = tmpRoot();
+  const pgFile = setupTask(root, { 'write-policy-feedback': { status: 'done' } });
+
+  const inp = createPagesPayload([{ title: '기획서 검토', markdown: '...' }]);
+  runHook(root, {
+    ...inp,
+    tool_response: createPagesResponse(['p-fb']),
+  });
+
+  const after = JSON.parse(fs.readFileSync(pgFile, 'utf8'));
+  assert.equal(after.stages['write-policy-feedback'].status, 'published');
+  assert.equal(after.stages['write-policy-feedback'].notionPageId, 'p-fb');
+});
