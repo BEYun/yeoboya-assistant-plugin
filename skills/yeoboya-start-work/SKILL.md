@@ -35,6 +35,8 @@ description: "Use when the user invokes /yeoboya-start-work <작업번호>, or e
 
 문자열 매칭 — "feature", "기능 추가", "추가" 등 일반 동의어 허용. 모호하면 재질문.
 
+선택된 workType은 progress.json에 영문 키(`feature`/`update`/`bugfix`)로 저장한다. Notion `작업 유형` select 값 변환(`신규 개발`/`변경/고도화`/`버그 수정`)은 publish-notion이 `WORKTYPE_LABEL` (state-schema.md §4) lookup으로 수행 — 본 skill이 한국어 라벨을 만들지 않는다.
+
 ## 4. 작업명 입력
 
 ```
@@ -69,13 +71,22 @@ description: "Use when the user invokes /yeoboya-start-work <작업번호>, or e
 
 ## 7. Notion 작업 DB row 등록
 
-`yeoboya-publish-notion` 호출 (mode="dispatch", 또는 sync 후 dispatch):
-1. sync로 row 존재 확인
-2. row 없으면 create. 있으면 update (workType / 작업명 / 담당자 / referenceTask 속성 반영)
-3. **도메인 추출**: sync 결과의 '도메인' select 속성 → progress의 별도 필드 또는 후속 stage skill에서 참조. 비어 있으면 사용자 입력 게이트:
-   ```
-   Notion 작업 row에 '도메인' 값이 비어 있습니다. 도메인을 입력해주세요 (예: 라이브방송):
-   ```
+`yeoboya-publish-notion` 호출 (mode="sync" → 후속 dispatch 또는 sync-only):
+
+1. **sync로 row 존재 확인** — `{ rowId, workType, 작업명, 도메인, 담당자[], 작업상태, iOS_완료, Android_완료 }` 수신
+2. **분기:**
+   - row 없음 → `publish-notion mode="dispatch"`로 신규 row 생성. properties:
+     - `workType: <workType>` (publish-notion이 WORKTYPE_LABEL로 변환)
+     - `작업명: <name>`
+     - `도메인: <사용자 입력 또는 생략>` (생략 시 PM이 Notion에서 수동)
+     - `담당자: { mode: "append", urls: [<workspace.notion.workerPageId 정규화>] }`
+   - row 있음 → `publish-notion mode="dispatch"`로 row update. properties는 위와 동일하되:
+     - `작업명`은 기존 값 우선 (이미 있으면 덮어쓰지 않음)
+     - `도메인`은 기존 값 우선
+     - `담당자`만 본인 추가 (publish-notion이 append union)
+3. **도메인 추출**: sync 결과의 `도메인` 사용. 비어 있고 사용자가 입력했으면 위 properties에 포함. 끝까지 비어 있으면 그대로 진행 (강제 안 함).
+
+작업 일정, iOS/Android 완료는 본 skill에서 **다루지 않는다**.
 
 ## 8. activeTask 갱신
 
@@ -97,3 +108,5 @@ progress.json 저장 직전 검증:
 - `workType ∈ {feature, update, bugfix}`
 - `stages` 키 셋이 `WORKTYPE_STAGES[<workType>]`와 정확히 일치
 - `referenceTask`는 update + 사용자 선택 시에만 존재
+- `stages` 키 셋의 첫 stage(workType별)가 WORKTYPE_STAGES[<workType>][0]과 일치
+- workType=feature/update면 `write-policy-feedback`이 stages에 존재
