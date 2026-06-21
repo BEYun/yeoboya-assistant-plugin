@@ -121,3 +121,21 @@ test('syncLinks ignores children without id', () => {
   assert.equal(links['write-policy'], undefined);
   assert.equal(links['draw-ui-flow'], 'p-ui');
 });
+
+test('syncLinks replaces a stale string at a multi-page key with a {title:id} map', () => {
+  const root = tmpRoot();
+  const f = workFile(root, 'DCL-6');
+  fs.mkdirSync(path.dirname(f), { recursive: true });
+  fs.writeFileSync(f, JSON.stringify({ work: 'DCL-6', links: { 'draw-data-flow': 'stale-string' } }));
+  const links = work.syncLinks(root, 'DCL-6', [{ title: '데이터 흐름도', id: 'p-df' }]);
+  assert.deepEqual(links['draw-data-flow'], { '데이터 흐름도': 'p-df' });
+});
+
+test('syncLinks overwrites a stale object at a single-page key with a string', () => {
+  const root = tmpRoot();
+  const f = workFile(root, 'DCL-7');
+  fs.mkdirSync(path.dirname(f), { recursive: true });
+  fs.writeFileSync(f, JSON.stringify({ work: 'DCL-7', links: { 'write-policy': { weird: 'obj' } } }));
+  const links = work.syncLinks(root, 'DCL-7', [{ title: '정책서', id: 'p-pol' }]);
+  assert.equal(links['write-policy'], 'p-pol');
+});
