@@ -15,6 +15,7 @@
 |---|---|
 | 작업 메타데이터 + Notion 산출물 링크 (workType 라벨, `links`) | 로컬 `.workflow/<작업번호>/work.json` |
 | write-code phase 진행 | 로컬 `.workflow/<작업번호>/code-phases.json` |
+| write-code phase spec | 로컬 `.workflow/<작업번호>/phases/<phase명>.md` |
 | 산출물 본문 (정책서/흐름도/QA 등) | Notion |
 | 워크스페이스 설정 | 로컬 `.workflow/workspace.json` |
 

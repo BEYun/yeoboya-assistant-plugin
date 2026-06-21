@@ -28,17 +28,20 @@ Tracks write-code's internal phase progress. Owned by `yeoboya-write-code`.
 
 ```json
 {
-  "currentPhase": "domain",
+  "currentPhase": "repository",
   "phases": {
-    "data":         { "status": "done" },
-    "domain":       { "status": "in-progress" },
-    "presentation": { "status": "todo" }
+    "api-client":  { "status": "done" },
+    "repository":  { "status": "in-progress" },
+    "view-model":  { "status": "todo" },
+    "ui":          { "status": "todo" }
   }
 }
 ```
 
 `phases[<key>].status` ∈ {`todo`, `in-progress`, `done`}.
 code-phases는 write-code 내부 phase 추적 전용이며, work.json에는 phase 상태를 두지 않는다.
+
+**주의**: phase 키는 write-code Phase Derivation 단계에서 동적으로 결정된다. 고정 값 없음.
 
 ## 3. `.workflow/workspace.json`
 
