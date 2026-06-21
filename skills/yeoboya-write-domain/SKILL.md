@@ -43,9 +43,9 @@ user-invocable: false
 
 ```
 yeoboya-publish-notion 호출:
-  task: <progress.task>
+  work: <작업번호>
   mode: "dispatch"
-  stage: "write-domain"
+  key: "write-domain"
   title: "도메인 명세서"
   markdown: <본문>
 ```

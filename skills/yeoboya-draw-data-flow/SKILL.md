@@ -78,9 +78,9 @@ API endpoint는 데이터 흐름도 액션·채널 매트릭스의 API 행과 1:
 
 ```
 yeoboya-publish-notion 호출:
-  task: <progress.task>
+  work: <작업번호>
   mode: "dispatch"
-  stage: "draw-data-flow"
+  key: "draw-data-flow"
   title: "데이터 흐름도"
   markdown: <데이터 흐름도 본문>
 ```
@@ -91,9 +91,9 @@ hook이 자동으로 work.json.links['draw-data-flow']['데이터 흐름도'] = 
 
 ```
 yeoboya-publish-notion 호출:
-  task: <progress.task>
+  work: <작업번호>
   mode: "dispatch"
-  stage: "draw-data-flow"
+  key: "draw-data-flow"
   title: "통신 명세서"
   markdown: <통신 명세서 본문>
   # 본 페이지를 데이터 흐름도 페이지의 자식으로 두려면 publish-notion이 parent 인자를 지원해야 함.

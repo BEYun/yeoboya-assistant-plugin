@@ -54,9 +54,9 @@ QA 시나리오 작성.
 
 ```
 yeoboya-publish-notion 호출:
-  task: <progress.task>
+  work: <작업번호>
   mode: "dispatch"
-  stage: "write-qa"
+  key: "write-qa"
   title: "QA 시나리오"
   markdown: <본문>
 ```

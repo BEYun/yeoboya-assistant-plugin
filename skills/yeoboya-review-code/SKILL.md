@@ -43,9 +43,9 @@ git diff <첫 커밋>^..<마지막 커밋>
 리뷰 산출물을 Notion으로 발행하려면:
 ```
 yeoboya-publish-notion 호출:
-  task: <progress.task>
+  work: <작업번호>
   mode: "dispatch"
-  stage: "review-code"
+  key: "review-code"
   title: "코드 리뷰 — <작업번호>"
   markdown: <리뷰 산출물>
 ```

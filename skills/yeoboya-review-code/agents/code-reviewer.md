@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Subagent for reviewing the diff of a specific task. Called by yeoboya-review-code skill.
+description: Subagent for reviewing the diff of a specific work. Called by yeoboya-review-code skill.
 ---
 
 # code-reviewer subagent
@@ -15,8 +15,8 @@ description: Subagent for reviewing the diff of a specific task. Called by yeobo
 ## 호출 규약
 
 호출자(yeoboya-review-code)에게서:
-- `task`: 작업번호
-- `diffRange`: 검토 대상 commit range (기본 `[<task>]` grep 매칭)
+- `work`: 작업번호
+- `diffRange`: 검토 대상 commit range (기본 `[<작업번호>]` grep 매칭)
 
 ## 응답
 

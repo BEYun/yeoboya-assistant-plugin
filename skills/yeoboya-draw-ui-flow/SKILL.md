@@ -53,9 +53,9 @@ UI 흐름도 작성. **화면(screen)과 사용자 액션(user action)을 ID로 
 
 ```
 yeoboya-publish-notion 호출:
-  task: <progress.task>
+  work: <작업번호>
   mode: "dispatch"
-  stage: "draw-ui-flow"
+  key: "draw-ui-flow"
   title: "UI 흐름도"
   markdown: <본문>
 ```

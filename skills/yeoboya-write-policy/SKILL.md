@@ -49,9 +49,9 @@ user-invocable: false
 
 ```
 yeoboya-publish-notion 호출:
-  task: <progress.task>
+  work: <작업번호>
   mode: "dispatch"
-  stage: "write-policy"
+  key: "write-policy"
   title: "정책서"
   markdown: <위에서 작성한 마크다운>
   properties: { workType: <workType>, 작업명: <name>, 도메인: <도메인 or 생략> }
