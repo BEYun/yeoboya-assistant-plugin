@@ -8,6 +8,18 @@ user-invocable: false
 
 작업 종결 검증 + 보고.
 
+## 0. 선행조건 확인 (필수 첫 단계)
+
+`.workflow/<작업번호>/work.json`을 Read → `reviewDone` 확인.
+
+`reviewDone`이 `false`이거나 필드가 없으면:
+```
+코드 리뷰가 완료되지 않았습니다. 코드 리뷰(review-code)를 먼저 진행해 주세요.
+```
+즉시 종료. 아래 단계를 진행하지 않는다.
+
+`reviewDone`이 `true`이면 §1부터 정상 진행.
+
 ## 1. 전제
 
 - 선행 stage 발행 여부를 확인하되, 미완료 stage가 있어도 hard 종료하지 않는다 — 보고에 ⚠ 표시 후 계속 진행.
