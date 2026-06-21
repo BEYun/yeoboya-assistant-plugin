@@ -1,6 +1,6 @@
 ---
 name: yeoboya-write-policy-feedback
-description: "Use ONLY when yeoboya-continue-work triggers this skill for workType=feature first stage, or workType=update when user opts to redo policy-feedback. NEVER invoke directly. Reads referenced 기획서 PDF (path) or Notion 기획서 page, walks the user through 5-perspective review (화면 흐름·상태 정의·엣지 케이스·인터랙션·일관성), drafts the 기획서 검토 markdown using references/policy-feedback-template.md, runs self-validation, then calls yeoboya-publish-notion with title='기획서 검토'."
+description: "Use ONLY when yeoboya-route-work triggers this skill. NEVER invoke directly. Reads referenced 기획서 PDF (path) or Notion 기획서 page, walks the user through 5-perspective review (화면 흐름·상태 정의·엣지 케이스·인터랙션·일관성), drafts the 기획서 검토 markdown using references/policy-feedback-template.md, runs self-validation, then calls yeoboya-publish-notion with title='기획서 검토'."
 user-invocable: false
 ---
 
@@ -10,8 +10,7 @@ user-invocable: false
 
 ## 1. 전제
 
-- `progress.json` 존재, `workType ∈ {feature, update}`
-- `stages.write-policy-feedback.status === "todo"` 또는 재실행 (호출자 책임)
+- work.json 존재 (route-work이 trigger)
 
 ## 2. 입력 fetch
 
@@ -59,13 +58,11 @@ yeoboya-publish-notion 호출:
   properties: { workType: <workType>, 작업명: <name>, 도메인: <도메인 or 생략> }
 ```
 
-publish 후 `notion-page-record` hook이 자동으로:
-- `stages.write-policy-feedback.status="published"` + `notionPageId` 부착
-- `STAGE_TO_TASK_STATE` lookup → 작업 상태를 "기획 단계"로 forward-only transition 신호
+publish 후 notion-page-record hook이 work.json.links['write-policy-feedback']에 pageId를 자동 기록한다.
 
 ## 6. 종료 안내
 
 ```
 기획서 검토 완료. 다음 권장 단계: 정책서 작성.
-컨텍스트 정리를 위해 새 세션에서 /yeoboya-continue-work을 호출하세요.
+컨텍스트 정리를 위해 새 세션에서 /yeoboya-route-work을 호출하세요.
 ```

@@ -1,6 +1,6 @@
 ---
 name: yeoboya-draw-data-flow
-description: "Use ONLY when yeoboya-continue-work triggers this skill for workType=feature/update after draw-ui-flow. NEVER invoke directly. For each user action ID from the UI 흐름도, defines the corresponding data flow action (API endpoint, Socket event, or local operation). Endpoints follow /도메인명 convention. Self-validates that every UI action ID is mapped. Publishes 'Notion 데이터 흐름도'."
+description: "Use ONLY when yeoboya-route-work triggers this work-list item. NEVER invoke directly. For each user action ID from the UI 흐름도, defines the corresponding data flow action (API endpoint, Socket event, or local operation). Endpoints follow /도메인명 convention. Self-validates that every UI action ID is mapped. Publishes 'Notion 데이터 흐름도'."
 user-invocable: false
 ---
 
@@ -10,8 +10,8 @@ user-invocable: false
 
 ## 1. 전제
 
-- `stages.draw-ui-flow.status` ∈ {`done`, `published`}
-- `stages.draw-data-flow.status === "todo"` 또는 재실행
+- work.json 존재.
+- UI 흐름도(work.json.links['draw-ui-flow'])가 있으면 참고한다. 없으면 사용자에게 알리고 진행 여부를 확인한다.
 
 ## 2. 입력 fetch
 
@@ -85,7 +85,7 @@ yeoboya-publish-notion 호출:
   markdown: <데이터 흐름도 본문>
 ```
 
-hook이 자동으로 `progress.stages.draw-data-flow.notionPageIds["데이터 흐름도"] = <pageId>` 부착. status는 `done` 유지 (`requiredTitles` 미충족).
+hook이 자동으로 work.json.links['draw-data-flow']['데이터 흐름도'] = <pageId>를 기록한다.
 
 ### 5.2 통신 명세서
 
@@ -100,7 +100,7 @@ yeoboya-publish-notion 호출:
   # 미지원이면 같은 dataSource에 평시 페이지로 publish 후, 데이터 흐름도 §footnote의 link만 수동 갱신.
 ```
 
-두 번째 publish 후 hook이 두 페이지 모두 도착을 인지 → `status = "published"` flip + `STAGE_TO_TASK_STATE` lookup으로 작업 상태 "설계 단계" 전이 신호.
+두 번째 publish 후 hook이 work.json.links['draw-data-flow']['통신 명세서'] = <pageId>를 추가 기록한다. (파이프라인 상태 변경 없음.)
 
 ### 5.3 데이터 흐름도 footnote 갱신
 
@@ -110,5 +110,5 @@ yeoboya-publish-notion 호출:
 
 ```
 데이터 흐름도 작성 완료. 다음 권장 단계: 코드 작성.
-새 세션에서 /yeoboya-continue-work을 호출하세요.
+새 세션에서 /yeoboya-route-work을 호출하세요.
 ```

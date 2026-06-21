@@ -1,6 +1,6 @@
 ---
 name: yeoboya-write-qa
-description: "Use ONLY when yeoboya-continue-work triggers this skill after review-code. NEVER invoke directly. Derives QA scenarios from prior deliverables (UI 흐름도, 데이터 흐름도, write-code commits): golden path, edge cases, regression. Self-validates, then publishes 'Notion QA 시나리오'."
+description: "Use ONLY when yeoboya-route-work triggers this work-list item. NEVER invoke directly. Derives QA scenarios from prior deliverables (UI 흐름도, 데이터 흐름도, write-code commits): golden path, edge cases, regression. Self-validates, then publishes 'Notion QA 시나리오'."
 user-invocable: false
 ---
 
@@ -10,14 +10,13 @@ QA 시나리오 작성.
 
 ## 1. 전제
 
-- `stages.review-code.status === "done"`
-- `stages.write-qa.status === "todo"` 또는 재실행
+- work.json 존재.
 
 ## 2. 입력 fetch
 
 - UI 흐름도 (액션 ID 추출)
 - 데이터 흐름도 (API/Socket 명세)
-- write-code 또는 fix-bug 커밋 (`git log --grep='[<task>]'`)
+- write-code 또는 fix-bug 커밋 (`git log --grep='[<작업번호>]'`)
 
 ## 3. 작성 절차
 
@@ -66,5 +65,5 @@ yeoboya-publish-notion 호출:
 
 ```
 QA 시나리오 작성 완료. 다음 권장 단계: QA 버그 수정 (발견된 게 있다면) 또는 작업 종결.
-새 세션에서 /yeoboya-continue-work을 호출하세요.
+새 세션에서 /yeoboya-route-work을 호출하세요.
 ```

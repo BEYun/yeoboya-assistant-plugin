@@ -1,6 +1,6 @@
 ---
 name: yeoboya-write-domain
-description: "Use ONLY when yeoboya-continue-work triggers this skill for workType=feature/update after write-policy. NEVER invoke directly. Fetches the 정책서 from Notion, walks the user through domain object/rule/actor/event modeling, runs self-validation, then calls yeoboya-publish-notion with title='도메인 명세서'."
+description: "Use ONLY when yeoboya-route-work triggers this work-list item. NEVER invoke directly. Fetches the 정책서 from Notion, walks the user through domain object/rule/actor/event modeling, runs self-validation, then calls yeoboya-publish-notion with title='도메인 명세서'."
 user-invocable: false
 ---
 
@@ -10,16 +10,16 @@ user-invocable: false
 
 ## 1. 전제
 
-- `stages.write-policy.status` ∈ {`done`, `published`} (없으면 안내 후 종료 — continue-work에 복귀)
-- `stages.write-domain.status === "todo"` 또는 재실행
+- work.json 존재.
+- 정책서(work.json.links['write-policy'])가 있으면 SOT로 사용한다. 없으면 사용자에게 알리고 진행 여부를 확인한다.
 
 ## 2. 입력 fetch
 
-1. 정책서 fetch (progress.stages.write-policy.notionPageId → notion-fetch)
+1. 정책서 fetch (work.json.links['write-policy'] → notion-fetch)
 
 ## 3. 작성 절차
 
-1. **정책 SOT footnote 확정** — `progress.stages.write-policy.notionPageId`를 정책 SOT link로 사용.
+1. **정책 SOT footnote 확정** — `work.json.links['write-policy']`를 정책 SOT link로 사용.
 2. **엔터티 도출** — 정책서 §용어/§역할/§정책 카탈로그에서 도메인 객체를 식별. 각 객체의 필드를 표로 정리. DB 식별자(`id`, 외래키)는 데이터 흐름도에서 확정하므로 본 문서엔 포함하지 않음.
 3. **역할별 시나리오** — 정책서 §역할 그대로 사용 + 각 역할의 주요 시나리오 행.
 4. **상태 머신** — 상태가 있는 엔터티만 §3.X 서브섹션 작성:
@@ -56,5 +56,5 @@ properties는 비워둠 (작업명/도메인/담당자 변경 없음).
 
 ```
 도메인 명세서 작성 완료. 다음 권장 단계: UI 흐름도.
-새 세션에서 /yeoboya-continue-work을 호출하세요.
+새 세션에서 /yeoboya-route-work을 호출하세요.
 ```

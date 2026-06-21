@@ -1,6 +1,6 @@
 ---
 name: yeoboya-fix-bug
-description: "Use ONLY when yeoboya-continue-work triggers this skill for workType=bugfix as the entry stage. NEVER invoke directly. NEVER use this for QA-found regressions — that's yeoboya-fix-qa-bug. This skill is for full-depth diagnosis of a user-reported bug (reproduction, root cause analysis, fix, test). Output is git commits with standard pattern; no Notion publish."
+description: "Use ONLY when yeoboya-route-work triggers this work-list item for workType=bugfix. NEVER invoke directly. NEVER use this for QA-found regressions — that's yeoboya-fix-qa-bug. This skill is for full-depth diagnosis of a user-reported bug (reproduction, root cause analysis, fix, test). Output is git commits with standard pattern; no Notion publish."
 user-invocable: false
 ---
 
@@ -10,8 +10,7 @@ user-invocable: false
 
 ## 1. 전제
 
-- workType=`bugfix`
-- `stages.fix-bug.status === "todo"` 또는 재실행
+- work.json 존재.
 
 ## 2. 진단 절차
 
@@ -40,9 +39,9 @@ user-invocable: false
 
 ## 5. 종료 안내
 
-`progress.stages.fix-bug.status = "done"` 업데이트 후:
+버그 수정 완료 후:
 
 ```
 버그 수정 완료. 다음 권장 단계: 코드 리뷰.
-새 세션에서 /yeoboya-continue-work을 호출하세요.
+새 세션에서 /yeoboya-route-work을 호출하세요.
 ```

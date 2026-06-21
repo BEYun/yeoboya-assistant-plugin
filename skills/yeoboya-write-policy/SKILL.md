@@ -1,6 +1,6 @@
 ---
 name: yeoboya-write-policy
-description: "Use ONLY when yeoboya-continue-work triggers this skill for workType=feature first stage, or workType=update when user opts to redo policy. NEVER invoke directly. Reads referenced 기획서 from Notion, walks the user through review items, drafts the 정책서 markdown using references/policy-template.md, runs self-validation, then calls yeoboya-publish-notion with title='정책서'. The notion-page-record hook handles the done→published transition automatically."
+description: "Use ONLY when yeoboya-route-work triggers this work-list item. NEVER invoke directly. Reads referenced 기획서 from Notion, walks the user through review items, drafts the 정책서 markdown using references/policy-template.md, runs self-validation, then calls yeoboya-publish-notion with title='정책서'. The notion-page-record hook records the pageId into work.json.links automatically."
 user-invocable: false
 ---
 
@@ -10,15 +10,14 @@ user-invocable: false
 
 ## 1. 전제
 
-- progress.json이 존재하고 `workType ∈ {feature, update}`
-- `stages.write-policy-feedback.status === "published"` (없으면 안내 후 종료 — continue-work이 우선 trigger)
-- `stages.write-policy.status === "todo"` 또는 재실행
+- work.json 존재.
+- 기획서 검토 산출물(work.json.links['write-policy-feedback'])이 있으면 입력으로 활용한다. 없으면 사용자에게 알리고 계속 진행할지 확인한다 (강제 종료 없음).
 
 ## 2. 입력 fetch
 
-1. Notion에서 작업 DB row 조회 (yeoboya-publish-notion mode=sync) → 작업명/도메인/담당자 등 보조 정보 + 작업 상태 확인
-2. **기획서 검토 페이지 fetch** (`progress.stages.write-policy-feedback.notionPageId` → notion-fetch)
-3. workType=update + referenceTask 있을 시: 참고 작업의 정책서 (`<referenceTask> progress.stages.write-policy.notionPageId`) fetch
+1. Notion에서 작업 DB row 조회 (yeoboya-publish-notion mode=sync) → 작업명/도메인/담당자 등 보조 정보
+2. **기획서 검토 페이지 fetch** (`work.json.links['write-policy-feedback']` → notion-fetch)
+3. workType=update + referenceWork 있을 시: 참고 작업의 정책서(`<referenceWork>`의 work.json.links['write-policy']) fetch
 
 ## 3. 작성 절차
 
@@ -58,11 +57,11 @@ yeoboya-publish-notion 호출:
   properties: { workType: <workType>, 작업명: <name>, 도메인: <도메인 or 생략> }
 ```
 
-publish 후 `notion-page-record` hook이 자동으로 `stages.write-policy.status="published"` + `notionPageId` 부착.
+publish 후 notion-page-record hook이 work.json.links['write-policy']에 pageId를 자동 기록.
 
 ## 6. 종료 안내
 
 ```
 정책서 작성 완료. 다음 권장 단계: 도메인 명세서.
-컨텍스트 정리를 위해 새 세션에서 /yeoboya-continue-work을 호출하세요.
+컨텍스트 정리를 위해 새 세션에서 /yeoboya-route-work을 호출하세요.
 ```

@@ -1,6 +1,6 @@
 ---
 name: yeoboya-draw-ui-flow
-description: "Use ONLY when yeoboya-continue-work triggers this skill for workType=feature/update after write-domain. NEVER invoke directly. Defines screens with unique IDs, user actions with unique IDs per screen, and the screen-transition diagram. Self-validates that every screen-action pair has an ID (used by draw-data-flow for ID-based linking). Publishes Notion page titled 'UI 흐름도'."
+description: "Use ONLY when yeoboya-route-work triggers this work-list item. NEVER invoke directly. Defines screens with unique IDs, user actions with unique IDs per screen, and the screen-transition diagram. Self-validates that every screen-action pair has an ID (used by draw-data-flow for ID-based linking). Publishes Notion page titled 'UI 흐름도'."
 user-invocable: false
 ---
 
@@ -10,8 +10,8 @@ UI 흐름도 작성. **화면(screen)과 사용자 액션(user action)을 ID로 
 
 ## 1. 전제
 
-- `stages.write-domain.status` ∈ {`done`, `published`}
-- `stages.draw-ui-flow.status === "todo"` 또는 재실행
+- work.json 존재.
+- 도메인 명세서(work.json.links['write-domain'])가 있으면 참고한다. 없으면 사용자에게 알리고 진행 여부를 확인한다.
 
 ## 2. 입력 fetch
 
@@ -64,5 +64,5 @@ yeoboya-publish-notion 호출:
 
 ```
 UI 흐름도 작성 완료. 다음 권장 단계: 데이터 흐름도.
-새 세션에서 /yeoboya-continue-work을 호출하세요.
+새 세션에서 /yeoboya-route-work을 호출하세요.
 ```

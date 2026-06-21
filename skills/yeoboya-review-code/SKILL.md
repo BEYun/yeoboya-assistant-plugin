@@ -1,6 +1,6 @@
 ---
 name: yeoboya-review-code
-description: "Use ONLY when yeoboya-continue-work triggers this skill after write-code (feature/update) or after fix-bug (bugfix). NEVER invoke directly. Collects task-related diff via `git log --grep='[<task>]'`, dispatches code-reviewer subagent for findings, lets user decide fix-or-pass per finding. Output: review markdown + (optional) Notion page. status=done after user closes findings; Notion publish is optional."
+description: "Use ONLY when yeoboya-route-work triggers this work-list item. NEVER invoke directly. Collects task-related diff via `git log --grep='[<작업번호>]'`, dispatches code-reviewer subagent for findings, lets user decide fix-or-pass per finding. Output: review markdown + (optional) Notion page. Notion publish is optional."
 user-invocable: false
 ---
 
@@ -10,8 +10,8 @@ user-invocable: false
 
 ## 1. 전제
 
-- `stages.write-code.status === "done"` (feature/update) 또는 `stages.fix-bug.status === "done"` (bugfix)
-- `stages.review-code.status === "todo"` 또는 재실행
+- work.json 존재.
+- 리뷰 대상 코드(git 커밋)가 있으면 진행한다.
 
 ## 2. diff 수집
 
@@ -29,7 +29,7 @@ git diff <첫 커밋>^..<마지막 커밋>
 ## 4. 사용자 결정 게이트
 
 리뷰 산출물의 각 발견 사항마다:
-- **수정** → 작은 수정 직접 적용 후 커밋. 큰 수정이면 "변경점 phase 재실행 권장" 안내 후 continue-work 복귀
+- **수정** → 작은 수정 직접 적용 후 커밋. 큰 수정이면 "변경점 phase 재실행 권장" 안내 후 route-work 복귀
 - **수용** → 리뷰 산출물에 "수용" 표시
 - **반박** → 사용자가 이유 작성, 산출물에 "반박" 표시
 
@@ -49,13 +49,13 @@ yeoboya-publish-notion 호출:
   title: "코드 리뷰 — <작업번호>"
   markdown: <리뷰 산출물>
 ```
-단, `review-code`는 `NOTION_STAGES`에 없음 — 발행해도 hook이 자동 `published` 전이하지 않음. publish 후 `status="done"` 수동 갱신.
+단, review-code는 `TITLE_TO_KEY`에 매핑이 없어 publish해도 hook이 work.json.links에 자동 기록하지 않는다.
 
 ## 7. 종료 안내
 
-`progress.stages.review-code.status = "done"` 업데이트 후:
+리뷰 종료 후:
 
 ```
 코드 리뷰 완료. 다음 권장 단계: QA 시나리오.
-새 세션에서 /yeoboya-continue-work을 호출하세요.
+새 세션에서 /yeoboya-route-work을 호출하세요.
 ```
