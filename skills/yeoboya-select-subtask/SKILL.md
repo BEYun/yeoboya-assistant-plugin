@@ -1,12 +1,12 @@
 ---
-name: yeoboya-route-work
-description: "사용자가 /yeoboya-route-work을 호출하거나, 작업목록을 열거나 작업을 진행하려는 의도를 표현할 때('작업 진행', '작업목록', '다음 작업') 사용한다. .workflow/에서 작업 항목(각각 work.json을 가짐)을 스캔하고, 사용자가 하나를 고르게 하며(activeWork는 [현재]로 표시), 추천 없이 phase별로 그룹화된 전체 작업목록을 보여준 뒤 Skill 도구로 선택된 yeoboya-<key> 스킬을 trigger한다. 구현에 착수하기 전 write-code 진입 게이트(sync-links + 필수 문서 검사; workType=feature는 정책서/UI 흐름도/데이터 흐름도가 없으면 하드 블록)를 포함한다."
+name: yeoboya-select-subtask
+description: "사용자가 /yeoboya-select-subtask을 호출하거나, 세부작업 목록을 열거나 작업을 진행하려는 의도를 표현할 때('작업 진행', '세부작업 목록', '다음 세부 작업') 사용한다. .workflow/에서 작업(각각 work.json을 가짐)을 스캔하고, 사용자가 하나를 고르게 하며(activeWork는 [현재]로 표시), 추천 없이 세부작업 그룹별로 묶은 세부작업 목록을 보여준 뒤 Skill 도구로 선택된 yeoboya-<key> 스킬을 trigger한다. 구현에 착수하기 전 write-code 진입 게이트(sync-links + 필수 문서 검사; workType=feature는 정책서/UI 흐름도/데이터 흐름도가 없으면 하드 블록)를 포함한다."
 user-invocable: true
 ---
 
-# yeoboya-route-work
+# yeoboya-select-subtask
 
-작업 선택 + 전체 작업목록 표시 + Skill 도구로 trigger.
+작업 선택 + 전체 세부작업 목록 표시 + Skill 도구로 trigger.
 
 ## 1. 작업 목록 스캔
 
@@ -26,9 +26,9 @@ user-invocable: true
 
 사용자 선택 → `workspace.json`의 `activeWork` 필드를 선택된 작업번호로 갱신.
 
-## 3. 작업목록 표시
+## 3. 세부작업 목록 표시
 
-`references/state-schema.md §4`의 `WORK_GROUPS` 순서로 전체 11개 항목을 표시. 마커 규칙:
+`references/state-schema.md §4`의 `SUBTASK_GROUPS` 순서로 전체 11개 세부 작업을 표시. 마커 규칙:
 
 | 조건 | 마커 |
 |---|---|
@@ -41,7 +41,7 @@ user-invocable: true
 ```
 [DCL-1234 · 라이브 방송 검색 · 기능 추가]
 
-작업목록 (원하는 항목을 선택하세요):
+세부작업 목록 (원하는 세부 작업을 선택하세요):
   ◆ 기획
     ✓ 기획서 검토
       정책서 작성
@@ -60,23 +60,23 @@ user-invocable: true
       작업 종결
 ```
 
-키·라벨 매핑은 `references/state-schema.md §4`의 `WORK_LABELS` 참조.
+키·라벨 매핑은 `references/state-schema.md §4`의 `SUBTASK_LABELS` 참조.
 
 ## 4. 메뉴 (자연어 응답)
 
-"진행할 항목 이름을 입력하세요 (종료: '취소')."
+"진행할 세부 작업 이름을 입력하세요 (종료: '취소')."
 
-항목 이름은 `WORK_LABELS`의 한국어 라벨 또는 키(예: `write-policy`) 모두 매칭. **단축키(y/s/n) 사용 금지.**
+세부 작업 이름은 `SUBTASK_LABELS`의 한국어 라벨 또는 키(예: `write-policy`) 모두 매칭. **단축키(y/s/n) 사용 금지.**
 
 ## 5. 응답 분기
 
 | 응답 | 동작 |
 |---|---|
-| 항목 이름 (`links`에 없음) | 해당 항목 trigger (§6 게이트 → §7) |
-| 항목 이름 (`links`에 이미 존재) | "이 항목은 이미 Notion 페이지가 있습니다. 다시 실행하면 기존 페이지를 갱신합니다. 진행할까요? (네/아니요)" → "네"면 trigger |
+| 세부 작업 이름 (`links`에 없음) | 해당 항목 trigger (§6 게이트 → §7) |
+| 세부 작업 이름 (`links`에 이미 존재) | "이 항목은 이미 Notion 페이지가 있습니다. 다시 실행하면 기존 페이지를 갱신합니다. 진행할까요? (네/아니요)" → "네"면 trigger |
 | "취소" / "종료" | 종료 |
 
-**작업 종결 전용 선행 확인** (항목 이름 매칭 후, trigger 전):
+**작업 종결 전용 선행 확인** (세부 작업 이름 매칭 후, trigger 전):
 
 `work.json.reviewDone`을 확인한다.
 - `false`이면 즉시 하드 블록:
@@ -93,11 +93,11 @@ user-invocable: true
 trigger 직전:
 
 1. **선행 문서 sync** — `yeoboya-publish-notion mode="sync-links"`(work=작업번호)를 호출해 작업 row 자식 페이지를 `work.json.links`에 동기화한다.
-2. **필수 집합 검사** — 필수 집합 = `{write-policy, draw-ui-flow, draw-data-flow}`. 동기화된 `work.json.links`에서 각 키 존재를 확인한다. 누락 키의 라벨은 `WORK_LABELS`(`references/state-schema.md §4`)로 변환.
+2. **필수 집합 검사** — 필수 집합 = `{write-policy, draw-ui-flow, draw-data-flow}`. 동기화된 `work.json.links`에서 각 키 존재를 확인한다. 누락 키의 라벨은 `SUBTASK_LABELS`(`references/state-schema.md §4`)로 변환.
    - **workType=feature**: 누락 키가 하나라도 있으면 **하드 블록**:
      ```
      코드 작성에는 다음 문서가 Notion에 먼저 있어야 합니다: <누락 라벨 목록>.
-     해당 문서를 직접 작성하거나 작업목록 항목으로 생성한 뒤 다시 시도하세요.
+     해당 문서를 직접 작성하거나 세부 작업으로 생성한 뒤 다시 시도하세요.
      ```
      §4 메뉴로 복귀. 진행 불가.
    - **workType=update 또는 bugfix**: 누락이 있어도 경고 후 확인:
@@ -121,10 +121,10 @@ Skill 도구로 해당 `yeoboya-<key>` skill 호출. 전달 컨텍스트:
 
 ## 8. 항목 완료 후 종료
 
-trigger된 skill이 완료 안내를 출력하면 본 skill은 **반복하지 않고 즉시 종료**. 사용자는 새 세션에서 `/yeoboya-route-work`를 다시 호출.
+trigger된 skill이 완료 안내를 출력하면 본 skill은 **반복하지 않고 즉시 종료**. 사용자는 새 세션에서 `/yeoboya-select-subtask`를 다시 호출.
 
 ## 9. Self-validation
 
 trigger 전:
-- 선택한 키가 `references/state-schema.md §4`의 `WORK_LIST`에 속하는지 검증.
+- 선택한 키가 `references/state-schema.md §4`의 `SUBTASK_LIST`에 속하는지 검증.
 - 대상이 `write-code`이면 §6 절차(sync-links 실행 → 필수 집합 검사)를 수행했는지 검증. feature인데 필수 3종이 동기화된 links에 모두 존재하지 않으면 trigger 금지.
