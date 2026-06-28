@@ -12,12 +12,28 @@ user-invocable: false
 
 - work.json 존재.
 - 리뷰 대상 코드(git 커밋)가 있으면 진행한다.
+- `work.json.codeBaseSha`(write-code가 work 호출 직전 기록한 코드 시작 SHA)를 §2 diff 수집의 기준점으로 쓴다. 없거나 `null`이면 legacy 경로(`git log --grep`)로 대체한다.
 
 ## 2. diff 수집
 
+`work.json.codeBaseSha`를 읽어 **range**로 수집한다(work이 작성한 커밋은 prefix가 빠져도 누락 없이 잡힌다 — 하이브리드 안전망):
+
+```bash
+BASE=$(jq -r '.codeBaseSha // empty' .workflow/<작업번호>/work.json)
+if [ -n "$BASE" ]; then
+  git log  "$BASE"..HEAD --oneline      # 이 작업 시작 이후 전부
+  git diff "$BASE"..HEAD                # 리뷰 대상 diff
+else
+  # legacy fallback (codeBaseSha 없음)
+  git log  --grep='\[<작업번호>\]' --oneline
+  git diff <첫 커밋>^..<마지막 커밋>
+fi
 ```
-git log --grep='\[<작업번호>\]' --oneline
-git diff <첫 커밋>^..<마지막 커밋>
+
+range 안에서 `[<작업번호>]` prefix가 없는 커밋은 **⚠로 표면화**한다(커밋 규약 위반 가시화 — 조용히 버리지 않음). 인터리브된 다른 작업의 커밋이면 사용자에게 이 작업 소속인지 확인받는다:
+
+```bash
+git log "$BASE"..HEAD --oneline | grep -v '\[<작업번호>\]'   # 있으면 ⚠ 보고
 ```
 
 수집된 diff 요약을 사용자에게 노출 (그라운딩).
