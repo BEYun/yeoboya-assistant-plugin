@@ -81,6 +81,6 @@ yeoboya-publish-notion 호출:
 리뷰 종료 후:
 
 ```
-코드 리뷰 완료. 다음 권장 단계: QA 시나리오.
+코드 리뷰 완료. 다음 권장 단계: 작업 종결.
 새 세션에서 /yeoboya-select-subtask을 호출하세요.
 ```

@@ -64,6 +64,8 @@ yeoboya-publish-notion 호출:
 ## 6. 종료 안내
 
 ```
-QA 시나리오 작성 완료. 다음 권장 단계: QA 버그 수정 (발견된 게 있다면) 또는 작업 종결.
+QA 시나리오 작성 완료. 다음 권장 단계: <다음 단계>.
 새 세션에서 /yeoboya-select-subtask을 호출하세요.
 ```
+
+`<다음 단계>`는 workType별로 채운다 (SUBTASK_GROUPS상 write-qa 다음 = "개발" 그룹): feature → "코드 작성", update → "코드 수정", bugfix → "버그 수정".
