@@ -18,7 +18,7 @@ user-invocable: false
 
 1. Notion에서 작업 DB row 조회 (yeoboya-publish-notion mode=sync) → 작업명/도메인/담당자 등 보조 정보
 2. **기획서 검토 페이지 fetch** (`work.json.links['write-policy-feedback']` → notion-fetch)
-3. **workType=update 이전 버전 fetch** — `references/state-schema.md §6` 규칙대로 이전 정책서(자기 작업 재publish 또는 `referenceWork`의 정책서)를 해석해 fetch한다. 후보가 없으면 §6 소프트 안내 후 신규 작성으로 진행 확인.
+3. **workType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 정책서를 해석한다(자기 재publish, 또는 `referenceWork`의 정책서를 Notion 권위 출처로 해석). **후보 있음(분기 A)** → fetch해 수정의 출발점으로. **후보 없음(분기 B)** → §6대로 사용자에게 기준 모듈/파일 경로를 요청해 코드베이스 기반으로 산출. provenance(이전 버전 출처)는 §6 표대로 메타 블록 + 변경 이력에 기록.
 
 ## 3. 작성 절차
 
@@ -34,14 +34,15 @@ user-invocable: false
 ## 4. Self-validation (publish 직전)
 
 - [ ] 페이지 제목 = "정책서" (hook 매핑용)
-- [ ] 메타 (업로드 일시 + 작업자) 명시
+- [ ] 메타 (업로드 일시 + 작업자 + 이전 버전) 명시
 - [ ] §용어 표 1행 이상
 - [ ] §역할 표 1행 이상
 - [ ] §파라미터 표 1행 이상 (해당 없으면 "해당 없음" 명시)
 - [ ] §정책 카탈로그에 카테고리 1개 이상 + POL-001 이상 ID 1개 이상
 - [ ] §정책 카탈로그의 모든 POL 행이 `예외` 컬럼 명시 (예외 없으면 "—")
 - [ ] §예외/롤백 동작 유형 분류 1개 이상 (해당 없으면 "해당 없음" 명시) — 각 분류는 트리거/동작/메시지 3열 표
-- [ ] §변경 이력 1행 이상 (수정 시 이번 변경, 신규 작성 시 `최초 작성` — state-schema §6)
+- [ ] §변경 이력 1행 이상 (분기 A 이번 변경 / 분기 B 코드베이스 산출 시 첫 행 `최초 작성` — state-schema §6)
+- [ ] provenance — 메타 "이전 버전" + 변경 이력 `참고본`이 §6 표와 일치 (referenceWork 번호 / `코드베이스: <경로>` / `—`)
 - [ ] §원본 자료 1개 이상
 
 실패 시 사용자에게 누락 항목 안내 후 보완.

@@ -18,7 +18,7 @@ user-invocable: false
 
 - UI 흐름도 + 도메인 명세서 fetch
 - UI 흐름도의 §2 사용자 액션 표에서 모든 액션 ID 추출
-- **workType=update 이전 버전 fetch** — `references/state-schema.md §6` 규칙대로 이전 데이터 흐름도/통신 명세서(자기 작업 재publish 또는 `referenceWork`의 동종 문서)를 해석해 fetch한다. 다중 페이지 키이므로 `links['draw-data-flow']`의 두 페이지 모두 대상. 후보가 없으면 §6 소프트 안내 후 신규 작성으로 진행 확인.
+- **workType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 데이터 흐름도/통신 명세서를 해석한다(자기 재publish, 또는 `referenceWork`의 동종 문서를 Notion 권위 출처로 해석 — 다중 페이지 키이므로 두 제목 모두 매칭). **후보 있음(분기 A)** → 두 페이지 fetch. **후보 없음(분기 B)** → §6대로 기준 모듈/파일 경로를 사용자에게 요청해 코드베이스 기반 산출. provenance는 §6 표대로 헤더 + 변경 이력에 기록.
 
 ## 3. 작성 절차
 
@@ -62,7 +62,8 @@ API endpoint는 데이터 흐름도 액션·채널 매트릭스의 API 행과 1:
 - [ ] 시퀀스 다이어그램에 actor/FE/BE/DB participants 모두 등장
 - [ ] 액션·채널 매트릭스의 `Action ID`가 UI 흐름도 §2에 존재
 - [ ] 액션·채널 매트릭스의 `Event ID`는 패턴 `<역할>:Event:N` + 역할별 unique
-- [ ] (workType=update) 데이터 흐름도 페이지에 §변경 이력 1행 이상 (이전 버전 없이 신규 진행 시 `최초 작성`)
+- [ ] (workType=update) 데이터 흐름도 페이지에 §변경 이력 1행 이상 (분기 B 코드베이스 산출 시 첫 행 `최초 작성`)
+- [ ] (workType=update) provenance — 데이터 흐름도 헤더 "이전 버전" + 변경 이력 `참고본`이 §6 표와 일치 (referenceWork 번호 / `코드베이스: <경로>` / `—`)
 
 ### 통신 명세서 페이지
 
