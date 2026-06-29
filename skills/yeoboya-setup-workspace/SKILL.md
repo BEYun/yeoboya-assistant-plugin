@@ -14,7 +14,7 @@ description: "사용자가 /yeoboya-setup-workspace를 호출할 때, workspace.
 | 검증 항목 | 확인 방법 |
 |---|---|
 | superpowers 플러그인 | superpowers의 skill 중 하나(예: `brainstorming`, `writing-plans`)가 available skills에 노출되는지 |
-| Notion MCP | `mcp__claude_ai_Notion__notion-search`를 빈 쿼리(`""`)로 실제 호출한다. 응답이 오면(빈 결과라도) 가용. 도구를 찾을 수 없다는 오류가 나면 미설치. |
+| Notion MCP | 노출된 도구 중 이름이 `__notion-search`로 끝나는 것을 빈 쿼리(`""`)로 실제 호출한다. (도구명은 `mcp__<서버>__notion-search` 형식이며 `<서버>` 접두사는 커넥터마다 다르다 — 로컬 구성 시 읽기 쉬운 이름, claude.ai 커넥터 시 UUID. 서버명에 결합하지 말 것.) 응답이 오면(빈 결과라도) 가용. 그런 도구가 없거나 도구 호출 오류가 나면 미설치. |
 | 하네스 플러그인 | 하네스 스킬(예: `harness-root`, `harness-check`)이 available skills에 노출되는지. write-code가 하네스 `work` 닫힌 루프에 위임하므로 하드 의존이다. |
 
 누락 시 출력 예시:

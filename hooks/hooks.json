@@ -13,7 +13,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "mcp__claude_ai_Notion__notion-(create-pages|update-page)",
+        "matcher": "mcp__.+__notion-(create-pages|update-page)",
         "hooks": [
           {
             "type": "command",

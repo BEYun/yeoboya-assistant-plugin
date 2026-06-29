@@ -5,7 +5,7 @@
 ## 필수 설치사항
 
 - **superpowers 플러그인** (brainstorming, writing-plans, executing-plans 등)
-- **Notion MCP** (`mcp__claude_ai_Notion__*` 도구군)
+- **Notion MCP** (`mcp__<notion-server>__notion-*` 도구군 — `<notion-server>` 접두사는 커넥터마다 다르다(로컬 구성 시 이름, claude.ai 커넥터 시 UUID). 플러그인은 서버명에 결합하지 않고 `notion-*` 도구명 suffix로 매칭한다. suffix 단일 출처: `hooks/lib/constants.json` `NOTION_TOOL_NAMES`)
 - **하네스 플러그인** (`work` 닫힌 루프 엔진 + `harness-root`/`harness-module`/`harness-check`/`harness-update`). write-code가 코드 구현을 `work`에 위임하므로 하드 의존이다.
 
 셋 중 하나라도 누락되면 `/yeoboya-setup-workspace`가 차단한다. 추가로 setup-workspace는 현재 repo의 하네스 **부트스트랩**(harness-root/harness-module 1회 실행)을 확인해 `workspace.json.harness.bootstrapped`에 기록한다.

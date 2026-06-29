@@ -5,7 +5,7 @@ const path = require('node:path');
 const os = require('node:os');
 const { spawnSync } = require('node:child_process');
 
-const { createPagesPayload, createPagesResponse } = require('./fixtures');
+const { createPagesPayload, createPagesResponse, UUID_SERVER } = require('./fixtures');
 
 function tmpRoot() { return fs.mkdtempSync(path.join(os.tmpdir(), 'yb-page-record-')); }
 
@@ -35,6 +35,18 @@ test('records pageId into links on matching title', () => {
   assert.equal(result.status, 0);
   const after = JSON.parse(fs.readFileSync(wf, 'utf8'));
   assert.equal(after.links['write-policy'], 'notion-page-abc');
+});
+
+test('records pageId under a UUID server name (PRB-01)', () => {
+  // Reproduces the claude.ai connector environment: server segment is a UUID,
+  // so the hook must match by the invariant tool-name suffix, not the server.
+  const root = tmpRoot();
+  const wf = setupWork(root, {});
+  const inp = createPagesPayload([{ title: '정책서', markdown: '...' }], { server: UUID_SERVER });
+  const result = runHook(root, { ...inp, tool_response: createPagesResponse(['notion-page-uuid']) });
+  assert.equal(result.status, 0);
+  const after = JSON.parse(fs.readFileSync(wf, 'utf8'));
+  assert.equal(after.links['write-policy'], 'notion-page-uuid');
 });
 
 test('does not record when title is unknown', () => {

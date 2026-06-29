@@ -1,12 +1,33 @@
 'use strict';
 
-const NOTION_WRITE_TOOLS = new Set([
-  'mcp__claude_ai_Notion__notion-create-pages',
-  'mcp__claude_ai_Notion__notion-update-page',
-]);
-
-const { TITLE_TO_KEY: TITLE_TO_KEY_OBJ, KEY_TO_TITLE } = require('./constants.json');
+const {
+  NOTION_TOOL_NAMES, TITLE_TO_KEY: TITLE_TO_KEY_OBJ, KEY_TO_TITLE,
+} = require('./constants.json');
 const TITLE_TO_KEY = new Map(Object.entries(TITLE_TO_KEY_OBJ));
+
+// Notion MCP tools are named `mcp__<server>__<toolName>`. The server segment
+// varies by how the connector was registered (readable name vs claude.ai's
+// UUID), but the tool-name suffix is invariant. Match by the suffix so links
+// recording works under any server (PRB-01). The single source for these
+// suffixes is constants.json `NOTION_TOOL_NAMES`.
+function notionToolRegExp(shortName) {
+  const escaped = shortName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^mcp__.+__${escaped}$`);
+}
+
+const CREATE_RE = notionToolRegExp(NOTION_TOOL_NAMES.createPages);
+const UPDATE_RE = notionToolRegExp(NOTION_TOOL_NAMES.updatePage);
+
+function notionToolKind(toolName) {
+  if (typeof toolName !== 'string') return null;
+  if (CREATE_RE.test(toolName)) return 'create';
+  if (UPDATE_RE.test(toolName)) return 'update';
+  return null;
+}
+
+function isNotionWriteTool(toolName) {
+  return notionToolKind(toolName) !== null;
+}
 
 function resolveKey(title) {
   if (typeof title !== 'string') return undefined;
@@ -23,7 +44,8 @@ function pickTitle(p) {
 
 function extractPagesFromInput(toolName, toolInput) {
   if (!toolInput) return [];
-  if (toolName === 'mcp__claude_ai_Notion__notion-create-pages') {
+  const kind = notionToolKind(toolName);
+  if (kind === 'create') {
     const raw = Array.isArray(toolInput.pages)
       ? toolInput.pages
       : toolInput.page ? [toolInput.page] : [];
@@ -32,7 +54,7 @@ function extractPagesFromInput(toolName, toolInput) {
       markdown: typeof p?.content === 'string' ? p.content : '',
     }));
   }
-  if (toolName === 'mcp__claude_ai_Notion__notion-update-page') {
+  if (kind === 'update') {
     const cmd = toolInput?.command;
     let markdown = null;
     if (cmd === 'replace_content' && typeof toolInput?.new_str === 'string') {
@@ -62,7 +84,9 @@ function extractPageIds(toolResponse) {
 }
 
 module.exports = {
-  NOTION_WRITE_TOOLS,
+  NOTION_TOOL_NAMES,
+  isNotionWriteTool,
+  notionToolKind,
   TITLE_TO_KEY,
   KEY_TO_TITLE,
   resolveKey,

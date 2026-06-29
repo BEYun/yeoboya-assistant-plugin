@@ -10,8 +10,8 @@ Notion 쓰기의 단일 진입점. 모든 세부작업 스킬은 산출물을 pu
 
 ## 1. 도구 호출 규약
 
-- create 경로: `mcp__claude_ai_Notion__notion-create-pages`
-- update 경로: `mcp__claude_ai_Notion__notion-update-page` (기존 pageId가 있을 때)
+- create 경로: 이름이 `__notion-create-pages`로 끝나는 Notion MCP 도구 (`mcp__<서버>__notion-create-pages` — `<서버>` 접두사는 커넥터마다 다르므로 서버명에 결합하지 말 것)
+- update 경로: 이름이 `__notion-update-page`로 끝나는 Notion MCP 도구 (기존 pageId가 있을 때)
 - **upsert 규칙**: `work.json.links[<key>]`(다중 페이지는 `links[<key>][<title>]`)가 있으면 update, 없으면 create. 이 판단은 **동기화된 links**를 전제로 한다 — 호출자(세부작업 스킬)는 진입 시 `mode="sync-links"`로 links를 먼저 최신화하므로, 다른 작업자가 만든 기존 페이지도 create가 아니라 update된다(중복 방지).
 
 ## 2. 페이지 제목 결정

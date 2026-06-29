@@ -1,4 +1,9 @@
 {
+  "NOTION_TOOL_NAMES": {
+    "search": "notion-search",
+    "createPages": "notion-create-pages",
+    "updatePage": "notion-update-page"
+  },
   "TITLE_TO_KEY": {
     "기획서 검토":   "write-policy-feedback",
     "정책서":        "write-policy",

@@ -2,11 +2,35 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const notion = require('../lib/notion');
-const { createPagesPayload, updatePagePayload, createPagesResponse } = require('./fixtures');
+const {
+  createPagesPayload, updatePagePayload, createPagesResponse, notionTool,
+  NAMED_SERVER, UUID_SERVER,
+} = require('./fixtures');
 
-test('NOTION_WRITE_TOOLS includes create-pages and update-page', () => {
-  assert.ok(notion.NOTION_WRITE_TOOLS.has('mcp__claude_ai_Notion__notion-create-pages'));
-  assert.ok(notion.NOTION_WRITE_TOOLS.has('mcp__claude_ai_Notion__notion-update-page'));
+test('isNotionWriteTool matches create/update under a named server (PRB-01)', () => {
+  assert.equal(notion.isNotionWriteTool(notionTool('notion-create-pages', NAMED_SERVER)), true);
+  assert.equal(notion.isNotionWriteTool(notionTool('notion-update-page', NAMED_SERVER)), true);
+});
+
+test('isNotionWriteTool matches create/update under a UUID server (PRB-01)', () => {
+  // claude.ai connector assigns a UUID server name; the suffix is invariant.
+  assert.equal(notion.isNotionWriteTool(notionTool('notion-create-pages', UUID_SERVER)), true);
+  assert.equal(notion.isNotionWriteTool(notionTool('notion-update-page', UUID_SERVER)), true);
+});
+
+test('isNotionWriteTool rejects non-write Notion tools and foreign tools', () => {
+  assert.equal(notion.isNotionWriteTool(notionTool('notion-search', UUID_SERVER)), false);
+  assert.equal(notion.isNotionWriteTool(notionTool('notion-fetch', UUID_SERVER)), false);
+  assert.equal(notion.isNotionWriteTool('mcp__other__create-pages'), false);
+  assert.equal(notion.isNotionWriteTool('notion-create-pages'), false); // no mcp__/server structure
+  assert.equal(notion.isNotionWriteTool('mcp____notion-create-pages'), false); // empty server segment
+  assert.equal(notion.isNotionWriteTool(undefined), false);
+});
+
+test('notionToolKind classifies create vs update regardless of server', () => {
+  assert.equal(notion.notionToolKind(notionTool('notion-create-pages', UUID_SERVER)), 'create');
+  assert.equal(notion.notionToolKind(notionTool('notion-update-page', UUID_SERVER)), 'update');
+  assert.equal(notion.notionToolKind(notionTool('notion-search', UUID_SERVER)), null);
 });
 
 test('resolveKey maps "정책서" → write-policy', () => {
@@ -51,6 +75,22 @@ test('extractPagesFromInput parses update-page replace_content', () => {
   assert.equal(pages.length, 1);
   assert.equal(pages[0].title, 'UI 흐름도');
   assert.equal(pages[0].markdown, '## 변경 본문');
+});
+
+test('extractPagesFromInput parses create-pages under a UUID server (PRB-01)', () => {
+  const payload = createPagesPayload([{ title: '정책서', markdown: '# 본문' }], { server: UUID_SERVER });
+  const pages = notion.extractPagesFromInput(payload.tool_name, payload.tool_input);
+  assert.equal(pages.length, 1);
+  assert.equal(pages[0].title, '정책서');
+  assert.equal(pages[0].markdown, '# 본문');
+});
+
+test('extractPagesFromInput parses update-page under a UUID server (PRB-01)', () => {
+  const payload = updatePagePayload({ title: 'UI 흐름도', markdown: '## 변경', server: UUID_SERVER });
+  const pages = notion.extractPagesFromInput(payload.tool_name, payload.tool_input);
+  assert.equal(pages.length, 1);
+  assert.equal(pages[0].title, 'UI 흐름도');
+  assert.equal(pages[0].markdown, '## 변경');
 });
 
 test('extractPageIds extracts ids from create-pages response array', () => {

@@ -2,7 +2,7 @@
 'use strict';
 
 const {
-  NOTION_WRITE_TOOLS, resolveKey, extractPagesFromInput, extractPageIds, KEY_TO_TITLE,
+  isNotionWriteTool, resolveKey, extractPagesFromInput, extractPageIds, KEY_TO_TITLE,
 } = require('./lib/notion');
 const { readStdin, allow, log } = require('./lib/hook-runtime');
 const { readActiveWork, recordLink } = require('./lib/work');
@@ -20,7 +20,7 @@ const MULTI_PAGE_KEY_TITLES = Object.fromEntries(
   catch { log({ hook: 'page-record', event: 'skip', reason: 'invalid-json' }); return allow(); }
 
   const toolName = payload?.tool_name || '';
-  if (!NOTION_WRITE_TOOLS.has(toolName)) return allow();
+  if (!isNotionWriteTool(toolName)) return allow();
 
   const pages = extractPagesFromInput(toolName, payload.tool_input);
   const ids = extractPageIds(payload.tool_response);

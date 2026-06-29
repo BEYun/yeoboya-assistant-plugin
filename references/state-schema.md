@@ -128,6 +128,13 @@ SUBTASK_LABELS = {
 # 런타임 정의: hooks/lib/constants.json (단일 SOT). analyze-bug↔"버그 분석" 포함.
 # 변경 시 해당 파일만 수정한다.
 
+# NOTION_TOOL_NAMES = { search: "notion-search", createPages: "notion-create-pages", updatePage: "notion-update-page" }
+# 런타임 정의: hooks/lib/constants.json (단일 SOT).
+# Notion MCP 도구는 mcp__<server>__<toolName> 구조이고 <server> 접두사는 커넥터마다
+# 다르다(로컬=이름, claude.ai 커넥터=UUID). hook/스킬은 서버명에 결합하지 말고 이 toolName
+# suffix로 매칭한다(notion.js: isNotionWriteTool/notionToolKind = ^mcp__.+__<suffix>$).
+# hooks.json matcher 정규식·스킬 본문·CLAUDE.md는 require 불가라 이 값을 미러링한다(정본은 여기).
+
 WORKTYPE_LABEL = { feature: "신규 개발", update: "변경/고도화", bugfix: "버그 수정" }
 
 # write-code는 phase 상수를 두지 않는다. 코드 작업은 하네스 `work` 닫힌 루프에 위임된다.
