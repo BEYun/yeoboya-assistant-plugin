@@ -5,6 +5,7 @@
 > 도메인 SOT: <도메인 명세서 link>
 > UI 흐름도: <UI 흐름도 link>
 > 통신 명세서 서브페이지: <통신 명세서 link>
+> 이전 버전: <referenceWork 작업번호 + Notion 링크 | 코드베이스 (<경로>) | —>
 
 ## 역할 인벤토리
 
@@ -60,9 +61,9 @@ sequenceDiagram
 
 ## 변경 이력
 
-(workType=update 또는 재publish 시 1행 이상. 이전 버전 없이 신규 작성이면 첫 행 `최초 작성`. — state-schema §6)
+(workType=update 또는 재publish 시 1행 이상. 이전 버전 없이 코드베이스 산출이면 첫 행 `최초 작성`. — state-schema §6)
 
 | 일자 | 작업자 | 변경 요약 | 참고본 |
 |---|---|---|---|
-| YYYY-MM-DD | <작업자> | <이번 수정 요약 / 최초 작성> | <referenceWork 작업번호 또는 —> |
+| YYYY-MM-DD | <작업자> | <이번 수정 요약 / 최초 작성> | <referenceWork 작업번호 | 코드베이스: <경로> | —> |
 ````

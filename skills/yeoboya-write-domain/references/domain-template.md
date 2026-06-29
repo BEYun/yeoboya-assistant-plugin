@@ -3,6 +3,7 @@
 > 정책 SOT: <정책서 Notion link>
 > 용어 / 파라미터 / 역할 / 정책 카탈로그 / 예외·롤백은 정책서 직접 참조.
 > 본 문서는 엔지니어링 elaborate 영역 (엔터티 · 역할별 시나리오 · 상태 머신 · 결정 필요 항목)만 다룬다.
+> 이전 버전: <referenceWork 작업번호 + Notion 링크 | 코드베이스 (<경로>) | —>
 
 ## 1. 엔터티
 
@@ -53,8 +54,8 @@ stateDiagram-v2
 
 ## 변경 이력
 
-(workType=update 또는 재publish 시 1행 이상. 이전 버전 없이 신규 작성이면 첫 행 `최초 작성`. — state-schema §6)
+(workType=update 또는 재publish 시 1행 이상. 이전 버전 없이 코드베이스 산출이면 첫 행 `최초 작성`. — state-schema §6)
 
 | 일자 | 작업자 | 변경 요약 | 참고본 |
 |---|---|---|---|
-| YYYY-MM-DD | <작업자> | <이번 수정 요약 / 최초 작성> | <referenceWork 작업번호 또는 —> |
+| YYYY-MM-DD | <작업자> | <이번 수정 요약 / 최초 작성> | <referenceWork 작업번호 | 코드베이스: <경로> | —> |
