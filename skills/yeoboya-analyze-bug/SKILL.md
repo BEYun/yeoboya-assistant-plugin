@@ -1,6 +1,6 @@
 ---
 name: yeoboya-analyze-bug
-description: "yeoboya-select-subtask이 이 세부 작업을 trigger할 때만 사용한다. 직접 호출 금지. bugfix 작업에서 상류 기획/설계 산출물이 없으므로 사용자에게 버그 내용(증상·재현 절차·기대 동작)을 직접 묻고, 원인을 분석하며, 성공 기준(acceptance criteria)을 정의한 markdown을 작성한 뒤 자체 검증을 거쳐 title='버그 분석'으로 yeoboya-publish-notion을 호출한다. notion-page-record hook이 pageId를 work.json.links['analyze-bug']에 자동 기록한다."
+description: "yeoboya-select-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. bugfix 과제에서 상류 기획/설계 산출물이 없으므로 사용자에게 버그 내용(증상·재현 절차·기대 동작)을 직접 묻고, 원인을 분석하며, 성공 기준(acceptance criteria)을 정의한 markdown을 작성한 뒤 자체 검증을 거쳐 title='버그 분석'으로 yeoboya-publish-notion을 호출한다. notion-page-record hook이 pageId를 task.json.links['analyze-bug']에 자동 기록한다."
 user-invocable: false
 ---
 
@@ -10,8 +10,8 @@ user-invocable: false
 
 ## 1. 전제
 
-- work.json 존재. workType=bugfix 가정 (select-subtask이 bugfix 뷰의 `진단` 그룹에서만 노출).
-- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식 페이지를 `work.json.links`에 동기화한다 — 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
+- task.json 존재. taskType=bugfix 가정 (select-subtask이 bugfix 뷰의 `진단` 그룹에서만 노출).
+- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다 — 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
 
 ## 2. 입력 수집 (사용자에게 직접 질의)
 
@@ -31,7 +31,7 @@ user-invocable: false
    ```markdown
    ## 메타
    - 업로드: <업로드 일시>
-   - 작업자: <worker>
+   - 과제자: <worker>
 
    ## 1. 문제/증상
    <관측된 현상>
@@ -52,7 +52,7 @@ user-invocable: false
 ## 4. Self-validation (publish 직전)
 
 - [ ] 페이지 제목 = "버그 분석" (hook 매핑용)
-- [ ] §메타 (업로드 일시 + 작업자) 명시
+- [ ] §메타 (업로드 일시 + 과제자) 명시
 - [ ] §1 문제/증상 1문장 이상
 - [ ] §2 재현 절차 1단계 이상
 - [ ] §3 원인 분석 1항목 이상 (확정 불가 시 "추정" 표기)
@@ -64,14 +64,14 @@ user-invocable: false
 
 ```
 yeoboya-publish-notion 호출:
-  work: <작업번호>
+  work: <과제번호>
   mode: "dispatch"
   key: "analyze-bug"
   markdown: <위에서 작성한 마크다운>
-  properties: { workType: "bugfix", 작업명: <name> }
+  properties: { taskType: "bugfix", 과제명: <name> }
 ```
 
-title은 전달하지 않는다 — publish-notion이 `KEY_TO_TITLE["analyze-bug"][0]` = "버그 분석"을 페이지 제목으로 사용. publish 후 notion-page-record hook이 work.json.links['analyze-bug']에 pageId를 자동 기록.
+title은 전달하지 않는다 — publish-notion이 `KEY_TO_TITLE["analyze-bug"][0]` = "버그 분석"을 페이지 제목으로 사용. publish 후 notion-page-record hook이 task.json.links['analyze-bug']에 pageId를 자동 기록.
 
 ## 6. 종료 안내
 

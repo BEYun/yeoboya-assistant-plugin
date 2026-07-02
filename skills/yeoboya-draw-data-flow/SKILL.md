@@ -1,6 +1,6 @@
 ---
 name: yeoboya-draw-data-flow
-description: "yeoboya-select-subtask이 이 세부 작업을 trigger할 때만 사용한다. 직접 호출 금지. UI 흐름도의 각 사용자 액션 ID마다 대응하는 데이터 흐름 액션(API 엔드포인트, Socket 이벤트, 또는 로컬 연산)을 정의한다. 엔드포인트는 /도메인명 규칙을 따른다. 모든 UI 액션 ID가 매핑되었는지 자체 검증한다. 'Notion 데이터 흐름도'를 게시한다."
+description: "yeoboya-select-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. UI 흐름도의 각 사용자 액션 ID마다 대응하는 데이터 흐름 액션(API 엔드포인트, Socket 이벤트, 또는 로컬 연산)을 정의한다. 엔드포인트는 /도메인명 규칙을 따른다. 모든 UI 액션 ID가 매핑되었는지 자체 검증한다. 'Notion 데이터 흐름도'를 게시한다."
 user-invocable: false
 ---
 
@@ -10,15 +10,15 @@ user-invocable: false
 
 ## 1. 전제
 
-- work.json 존재.
-- UI 흐름도(work.json.links['draw-ui-flow'])와 도메인 명세서(work.json.links['write-domain'])가 있으면 참고한다. 없으면 사용자에게 알리고 진행 여부를 확인한다.
-- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식 페이지를 `work.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
+- task.json 존재.
+- UI 흐름도(task.json.links['draw-ui-flow'])와 도메인 명세서(task.json.links['write-domain'])가 있으면 참고한다. 없으면 사용자에게 알리고 진행 여부를 확인한다.
+- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 과제자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
 
 ## 2. 입력 fetch
 
 - UI 흐름도 + 도메인 명세서 fetch
 - UI 흐름도 §1 화면·액션 통합 표의 "사용자 액션" 열에서 모든 액션 ID 추출
-- **workType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 데이터 흐름도/통신 명세서를 해석한다(자기 재publish, 또는 `referenceWork`의 동종 문서를 Notion 권위 출처로 해석 — 다중 페이지 키이므로 두 제목 모두 매칭). **후보 있음(분기 A)** → 두 페이지 fetch. **후보 없음(분기 B)** → §6대로 기준 모듈/파일 경로를 사용자에게 요청해 코드베이스 기반 산출. provenance는 §6 표대로 헤더 + 변경 이력에 기록.
+- **taskType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 데이터 흐름도/통신 명세서를 해석한다(자기 재publish, 또는 `referenceTask`의 동종 문서를 Notion 권위 출처로 해석 — 다중 페이지 키이므로 두 제목 모두 매칭). **후보 있음(분기 A)** → 두 페이지 fetch. **후보 없음(분기 B)** → §6대로 기준 모듈/파일 경로를 사용자에게 요청해 코드베이스 기반 산출. provenance는 §6 표대로 헤더 + 변경 이력에 기록.
 
 ## 3. 작성 절차
 
@@ -37,7 +37,7 @@ user-invocable: false
 5. 각 페르소나별로:
    - 시퀀스 다이어그램 (actor/FE/BE/DB participants, rect로 단계 그룹)
    - 액션·채널 매트릭스 (Action ID는 UI 흐름도 §1 화면·액션 통합 표에서 재사용, Event ID는 본 페이지에서 신규 정의)
-6. **변경 이력** (workType=update, `references/state-schema.md §6`) — 데이터 흐름도(parent) 페이지의 §변경 이력에 기록한다. 이전 버전이 있으면 이번 수정 1행 추가, 이전 버전 없이 신규로 진행한 경우 첫 행을 `최초 작성`으로 기록.
+6. **변경 이력** (taskType=update, `references/state-schema.md §6`) — 데이터 흐름도(parent) 페이지의 §변경 이력에 기록한다. 이전 버전이 있으면 이번 수정 1행 추가, 이전 버전 없이 신규로 진행한 경우 첫 행을 `최초 작성`으로 기록.
 
 ### 3.2 통신 명세서 작성
 
@@ -63,8 +63,8 @@ Request/Response/Payload는 예외 없이 코드 블럭(```json)으로 감싼다
 - [ ] 시퀀스 다이어그램에 actor/FE/BE/DB participants 모두 등장
 - [ ] 액션·채널 매트릭스의 `Action ID`가 UI 흐름도 §1 화면·액션 통합 표에 존재
 - [ ] 액션·채널 매트릭스의 `Event ID`는 패턴 `<페르소나>:Event:N` + 페르소나별 unique
-- [ ] (workType=update) 데이터 흐름도 페이지에 §변경 이력 1행 이상 (분기 B 코드베이스 산출 시 첫 행 `최초 작성`)
-- [ ] (workType=update) provenance — 데이터 흐름도 헤더 "이전 버전" + 변경 이력 `참고본`이 §6 표와 일치 (referenceWork 번호 / `코드베이스: <경로>` / `—`)
+- [ ] (taskType=update) 데이터 흐름도 페이지에 §변경 이력 1행 이상 (분기 B 코드베이스 산출 시 첫 행 `최초 작성`)
+- [ ] (taskType=update) provenance — 데이터 흐름도 헤더 "이전 버전" + 변경 이력 `참고본`이 §6 표와 일치 (referenceTask 번호 / `코드베이스: <경로>` / `—`)
 
 ### 통신 명세서 페이지
 
@@ -86,20 +86,20 @@ Request/Response/Payload는 예외 없이 코드 블럭(```json)으로 감싼다
 
 ```
 yeoboya-publish-notion 호출:
-  work: <작업번호>
+  work: <과제번호>
   mode: "dispatch"
   key: "draw-data-flow"
   title: "데이터 흐름도"
   markdown: <데이터 흐름도 본문>
 ```
 
-hook이 자동으로 work.json.links['draw-data-flow']['데이터 흐름도'] = <pageId>를 기록한다.
+hook이 자동으로 task.json.links['draw-data-flow']['데이터 흐름도'] = <pageId>를 기록한다.
 
 ### 5.2 통신 명세서
 
 ```
 yeoboya-publish-notion 호출:
-  work: <작업번호>
+  work: <과제번호>
   mode: "dispatch"
   key: "draw-data-flow"
   title: "통신 명세서"
@@ -108,7 +108,7 @@ yeoboya-publish-notion 호출:
   # 미지원이면 같은 dataSource에 평시 페이지로 publish 후, 데이터 흐름도 §footnote의 link만 수동 갱신.
 ```
 
-두 번째 publish 후 hook이 work.json.links['draw-data-flow']['통신 명세서'] = <pageId>를 추가 기록한다. (파이프라인 상태 변경 없음.)
+두 번째 publish 후 hook이 task.json.links['draw-data-flow']['통신 명세서'] = <pageId>를 추가 기록한다. (파이프라인 상태 변경 없음.)
 
 ### 5.3 데이터 흐름도 footnote 갱신
 

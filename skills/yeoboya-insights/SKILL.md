@@ -1,10 +1,10 @@
 ---
 name: yeoboya-insights
-description: 사용자가 /yeoboya-insights를 호출하거나 '마찰 분석', '불편 로그 분석', '개선 인사이트', '작업 불편 대시보드'를 원할 때 사용한다. `.workflow/improvement-log.jsonl`을 집계해 단일 HTML 대시보드(`.workflow/insights.html`)를 만들고 원인 분석 서술을 채운 뒤 브라우저로 열도록 안내한다. 세부작업이 아니며 select-subtask 흐름 밖의 독립 분석 도구다.
+description: 사용자가 /yeoboya-insights를 호출하거나 '마찰 분석', '불편 로그 분석', '개선 인사이트', '과제 불편 대시보드'를 원할 때 사용한다. `.workflow/improvement-log.jsonl`을 집계해 단일 HTML 대시보드(`.workflow/insights.html`)를 만들고 원인 분석 서술을 채운 뒤 브라우저로 열도록 안내한다. 세부작업이 아니며 select-subtask 흐름 밖의 독립 분석 도구다.
 user-invocable: true
 ---
 
-# yeoboya-insights — 작업 불편 분석
+# yeoboya-insights — 과제 불편 분석
 
 `.workflow/improvement-log.jsonl`(마찰 기록)을 읽어 개선 우선순위를 뽑는다.
 

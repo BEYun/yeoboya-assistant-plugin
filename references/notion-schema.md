@@ -1,21 +1,21 @@
 # notion-schema
 
-작업 DB · 팀원 DB · 산출물 페이지 publish 시 사용하는 Notion 측 스키마 SoT.
+과제 DB · 팀원 DB · 산출물 페이지 publish 시 사용하는 Notion 측 스키마 SoT.
 
 state-schema.md(로컬)와 분리. **변경은 본 파일에서 먼저, 그 다음 hook lib와 skill body에 반영.**
 
-## 1. 작업 DB
+## 1. 과제 DB
 
 - URL: `collection://f8c09dfc-cbf8-40f2-ac4c-a6a1b57ef030`
 - 팀원 목록 DB: `collection://cc47fa31-4d64-4ecc-ad96-95c0048c355c`
 
 ### 산출물 페이지 위치
 
-세부작업 산출물(정책서, UI 흐름도, 데이터 흐름도, 통신 명세서, 기획서 검토)은 해당 작업 DB **row의 자식(child) 페이지**로 생성된다. 제목은 항상 플러그인 경유 정규값(`hooks/lib/constants.json`의 `KEY_TO_TITLE` 값)이다. `sync-links`는 row의 자식(페이지 및 데이터베이스)을 나열해 제목 정확 일치로 `work.json.links`를 채운다.
+세부작업 산출물(정책서, UI 흐름도, 데이터 흐름도, 통신 명세서, 기획서 검토)은 해당 과제 DB **row의 자식(child) 페이지**로 생성된다. 제목은 항상 플러그인 경유 정규값(`hooks/lib/constants.json`의 `KEY_TO_TITLE` 값)이다. `sync-links`는 row의 자식(페이지 및 데이터베이스)을 나열해 제목 정확 일치로 `task.json.links`를 채운다.
 
 ### QA 시나리오 — 자식 데이터베이스(테이블)
 
-**QA 시나리오(write-qa)만 예외**: 마크다운 자식 페이지가 아니라 작업 row **자식 데이터베이스**로 생성된다(제목 "QA 시나리오"). 행=테스트 케이스, 컬럼=`케이스 ID`(title)·`페르소나`·`카테고리`·`시나리오`·`관련 API / Socket`·`iOS 결과`·`Android 결과`·`Web 결과`(`페르소나`는 도메인 명세서 집합 기반 동적 select, 그 외 select 옵션은 write-qa SKILL §3). `케이스 ID`는 페르소나→카테고리 순으로 부여해 ID 오름차순 정렬 시 페르소나·카테고리별로 묶인다. 행 본문에 `사전 조건`/`테스트 단계`/`기대 결과`. 플랫폼별 결과 컬럼은 신규 행 시 대상 플랫폼 `미테스트`·비대상 `N/A`이고 QA 수행 시 사람이 채운다.
+**QA 시나리오(write-qa)만 예외**: 마크다운 자식 페이지가 아니라 과제 row **자식 데이터베이스**로 생성된다(제목 "QA 시나리오"). 행=테스트 케이스, 컬럼=`케이스 ID`(title)·`페르소나`·`카테고리`·`시나리오`·`관련 API / Socket`·`iOS 결과`·`Android 결과`·`Web 결과`(`페르소나`는 도메인 명세서 집합 기반 동적 select, 그 외 select 옵션은 write-qa SKILL §3). `케이스 ID`는 페르소나→카테고리 순으로 부여해 ID 오름차순 정렬 시 페르소나·카테고리별로 묶인다. 행 본문에 `사전 조건`/`테스트 단계`/`기대 결과`. 플랫폼별 결과 컬럼은 신규 행 시 대상 플랫폼 `미테스트`·비대상 `N/A`이고 QA 수행 시 사람이 채운다.
 
 - `links['write-qa']` = **데이터베이스 페이지 id**(`collection://` data source id가 아님). 생성 직후 `dispatch-db`가 `list-children → sync-links`로 기록한다(publish-notion §4.5). `child_database` 블록도 `list-children`에 포함되므로 제목 "QA 시나리오"가 `resolveKey`로 매칭된다.
 - 행 페이지(케이스 ID 제목)는 `TITLE_TO_KEY`에 없어 `notion-page-record` hook이 unknown-title로 skip → links 미오염. 데이터베이스 생성(`notion-create-database`)은 hook의 write 도구가 아니라 통과.
@@ -33,21 +33,21 @@ write-policy-feedback은 **버전드 키**다(`constants.json` `VERSIONED_TITLE_
 
 | 속성 | 타입 | 기점 스킬 | 동작 |
 |---|---|---|---|
-| 작업명 | title | `create-work` | 입력 → set |
-| 작업 번호 | text | `create-work` | `<work>` → set |
-| 작업 유형 | select | `create-work` | workType 매핑 → set |
+| 과제명 | title | `create-work` | 입력 → set |
+| 과제 번호 | text | `create-work` | `<work>` → set |
+| 과제 유형 | select | `create-work` | taskType 매핑 → set |
 | 도메인 | select | `create-work` | row에 비어 있으면 입력(optional) → set |
 | 담당자 | relation (multi) | `create-work` | 본인 worker URL만 append (replace 금지) |
-| 작업 상태 | select | — | 스킬 범위 외 (Notion에서 수동 설정) |
-| 작업 일정 | date range | — | 스킬 범위 외 (Notion에서 수동 설정) |
+| 과제 상태 | select | — | 스킬 범위 외 (Notion에서 수동 설정) |
+| 과제 일정 | date range | — | 스킬 범위 외 (Notion에서 수동 설정) |
 | iOS 완료 | checkbox | `finish-work` | `workspace.platform=="iOS"`면 true |
 | Android 완료 | checkbox | `finish-work` | `workspace.platform=="Android"`면 true |
 
 각 속성은 해당 기점 스킬만 변경 권한을 가진다. 그 외 스킬은 read-only.
 
-## 3. workType ↔ 작업 유형
+## 3. taskType ↔ 과제 유형
 
-| workType | 작업 유형 (select) |
+| taskType | 과제 유형 (select) |
 |---|---|
 | feature | 신규 개발 |
 | update | 변경/고도화 |

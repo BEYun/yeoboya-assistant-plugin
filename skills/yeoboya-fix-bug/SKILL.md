@@ -1,16 +1,16 @@
 ---
 name: yeoboya-fix-bug
-description: "yeoboya-select-subtask이 workType=bugfix에 대해 이 세부 작업을 trigger할 때만 사용한다. 직접 호출 금지. QA에서 발견된 회귀에는 절대 사용하지 말 것 — 그건 yeoboya-fix-qa-bug다. 이 스킬은 사용자가 보고한 버그의 풀뎁스 진단(재현, 근본 원인 분석, 수정, 테스트)을 위한 것이다. 출력은 표준 패턴의 git 커밋이며, Notion 게시는 없다."
+description: "yeoboya-select-subtask이 taskType=bugfix에 대해 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. QA에서 발견된 회귀에는 절대 사용하지 말 것 — 그건 yeoboya-fix-qa-bug다. 이 스킬은 사용자가 보고한 버그의 풀뎁스 진단(재현, 근본 원인 분석, 수정, 테스트)을 위한 것이다. 출력은 표준 패턴의 git 커밋이며, Notion 게시는 없다."
 user-invocable: false
 ---
 
 # yeoboya-fix-bug
 
-사용자 보고 신규 버그의 수술 수준 진단/수정. **bugfix workType의 entry stage 전용** — QA 발견 회귀는 `yeoboya-fix-qa-bug` 사용.
+사용자 보고 신규 버그의 수술 수준 진단/수정. **bugfix taskType의 entry stage 전용** — QA 발견 회귀는 `yeoboya-fix-qa-bug` 사용.
 
 ## 1. 전제
 
-- work.json 존재.
+- task.json 존재.
 
 ## 2. 진단 절차
 
@@ -26,7 +26,7 @@ user-invocable: false
 
 ## 3. 커밋 메시지
 
-표준 패턴: `[<작업번호>] fix: <증상 요약>` (예: `[DCL-1245] fix: 클럽 입장 시 알림 중복 발송`)
+표준 패턴: `[<과제번호>] fix: <증상 요약>` (예: `[DCL-1245] fix: 클럽 입장 시 알림 중복 발송`)
 
 본문에 근본 원인 + 수정 접근 요약.
 
@@ -41,7 +41,7 @@ user-invocable: false
 
 버그 수정+테스트가 끝나면 (커밋 직후):
 
-`.workflow/<작업번호>/work.json`을 Read → `codeWriteDone` 필드를 `true`로 설정 → Write.
+`.workflow/<과제번호>/task.json`을 Read → `codeWriteDone` 필드를 `true`로 설정 → Write.
 
 이 플래그가 `review-code` 진입 하드 선행조건이자 select-subtask 완료 마커(✓)의 근거다(state-schema §1). bugfix에는 Notion 산출물이 없는 코드 세부작업이므로 `links`에 키가 생기지 않아 이 플래그가 완료를 나타내는 유일한 수단이다.
 

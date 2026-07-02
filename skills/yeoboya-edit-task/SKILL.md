@@ -1,23 +1,23 @@
 ---
 name: yeoboya-edit-task
-description: "사용자가 /yeoboya-edit-task를 호출하거나, 작업 진행 중 정책·흐름·명세가 바뀌었다고 알릴 때('정책이 바뀌었어', '흐름도 수정됐어', '명세 변경됐어', '이 내용 반영해줘', '변경 전파') 사용한다. 진행 중인 작업(activeWork)에 대해 변경 내용을 받아 정책서~QA 시나리오 중 영향 범위를 판단해 사용자에게 검토받고, 영향 문서를 의존 순서로 기존 문서 스킬을 재사용해 갱신하며, 코드가 영향받으면 write-code 경유로 재작성을 위임한다. 세부작업이 아니며 select-subtask 흐름 밖의 독립 도구다. 변경이 문서 하나라도 건드릴 수 있으면 임의 판단으로 넘기지 말고 이 스킬을 사용한다."
+description: "사용자가 /yeoboya-edit-task를 호출하거나, 과제 진행 중 정책·흐름·명세가 바뀌었다고 알릴 때('정책이 바뀌었어', '흐름도 수정됐어', '명세 변경됐어', '이 내용 반영해줘', '변경 전파') 사용한다. 진행 중인 과제(activeTask)에 대해 변경 내용을 받아 정책서~QA 시나리오 중 영향 범위를 판단해 사용자에게 검토받고, 영향 문서를 의존 순서로 기존 문서 스킬을 재사용해 갱신하며, 코드가 영향받으면 write-code 경유로 재작성을 위임한다. 세부작업이 아니며 select-subtask 흐름 밖의 독립 도구다. 변경이 문서 하나라도 건드릴 수 있으면 임의 판단으로 넘기지 말고 이 스킬을 사용한다."
 user-invocable: true
 ---
 
 # yeoboya-edit-task — 변경 전파 (문서~코드)
 
-작업 도중 바뀐 정책·흐름·명세를 **영향 범위 판단 → 문서 순차 갱신 → 코드 재작성 위임**으로 전파한다.
+과제 도중 바뀐 정책·흐름·명세를 **영향 범위 판단 → 문서 순차 갱신 → 코드 재작성 위임**으로 전파한다.
 기존 산출물을 수정하는 오케스트레이터이며, 각 문서 갱신·코드 구현은 기존 스킬(`yeoboya-write-*`,
 `yeoboya-draw-*`, `yeoboya-write-code`)에 위임한다. (설계: `docs/superpowers/specs/2026-07-02-edit-work-change-propagation-design.md`)
 
 ## 1. 전제 / 진입
 
-- `.workflow/workspace.json` 존재. `activeWork`로 대상 작업을 확정한다. 없거나 여러 작업 중
+- `.workflow/workspace.json` 존재. `activeTask`로 대상 과제를 확정한다. 없거나 여러 과제 중
   고를 필요가 있으면 `.workflow/`를 스캔해 사용자에게 고르게 한다(select-subtask §1 패턴).
-  작업이 하나도 없으면 안내 후 종료.
-- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=작업번호)를 1회
-  호출해 작업 row 자식 페이지를 `work.json.links`에 동기화한다. 전파 판단이 **최신 문서 존재 상태**
-  에서 시작하도록 하기 위함이다(다른 작업자가 만든 선행 문서도 인식).
+  과제가 하나도 없으면 안내 후 종료.
+- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=과제번호)를 1회
+  호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다. 전파 판단이 **최신 문서 존재 상태**
+  에서 시작하도록 하기 위함이다(다른 과제자가 만든 선행 문서도 인식).
 
 ## 2. 변경 내용 수집
 
@@ -30,8 +30,8 @@ user-invocable: true
 
 ## 3. 영향 범위 판단 (제안 → 확정)
 
-1. **현재 산출물 파악**: `work.json.links`의 키(존재하는 문서) + `codeWriteDone`(코드 착수/완료 여부).
-2. **workType-aware 의존 사슬**(`references/state-schema.md §4` `SUBTASK_GROUPS` 순서):
+1. **현재 산출물 파악**: `task.json.links`의 키(존재하는 문서) + `codeWriteDone`(코드 착수/완료 여부).
+2. **taskType-aware 의존 사슬**(`references/state-schema.md §4` `SUBTASK_GROUPS` 순서):
    - feature/update: 정책서 → 도메인 명세서 → UI 흐름도 → 데이터 흐름도 → QA 시나리오 → 코드
      (기획서 검토가 있고 기획서 자체가 바뀌었으면 정책서 앞에 포함)
    - bugfix: 버그 분석 → QA 시나리오 → 코드
@@ -59,7 +59,7 @@ user-invocable: true
 스펙 변경 빈도(상류 기획 불안정성)를 볼 수 있게 하기 위함이다. (도구 결함이 아니라 개선 신호다.)
 
 ```bash
-echo '{"category":"spec-change","skill":"yeoboya-edit-task","workNo":"<작업번호>","workType":"<workType>","severity":"friction","what":"<변경 델타 요약>","expected":"<확정 영향 문서 목록>","source":"agent"}' \
+echo '{"category":"spec-change","skill":"yeoboya-edit-task","workNo":"<과제번호>","taskType":"<taskType>","severity":"friction","what":"<변경 델타 요약>","expected":"<확정 영향 문서 목록>","source":"agent"}' \
   | node ${CLAUDE_PLUGIN_ROOT}/hooks/friction-log.js
 ```
 
@@ -71,9 +71,9 @@ echo '{"category":"spec-change","skill":"yeoboya-edit-task","workNo":"<작업번
 확정된 문서 범위를 **의존 순서**(§3의 사슬, `SUBTASK_GROUPS` 순서)로 정렬해 **상류부터** 처리한다.
 각 문서마다 해당 `yeoboya-<key>` 스킬을 **Skill 도구로 trigger**하며 다음을 컨텍스트로 전달한다:
 
-- `work`(작업번호), `workType`, **변경 델타**(§2), 필요 시 `referenceWork`
-- **명시 지시**: "기존 `work.json.links[<key>]` 페이지를 `notion-fetch`해 **출발점**으로 삼고, 이번 변경
-  델타만 반영하라. 전체 재작성이 아니라 **기존 문서 수정**이다." — 이 지시는 workType과 무관하게
+- `work`(과제번호), `taskType`, **변경 델타**(§2), 필요 시 `referenceTask`
+- **명시 지시**: "기존 `task.json.links[<key>]` 페이지를 `notion-fetch`해 **출발점**으로 삼고, 이번 변경
+  델타만 반영하라. 전체 재작성이 아니라 **기존 문서 수정**이다." — 이 지시는 taskType과 무관하게
   준다(feature 기본 경로가 신규 생성이어서 지시 없이는 기존 문서를 재생성할 수 있으므로).
 
 각 문서 스킬은 자체 self-validation 후 `publish-notion`으로 republish하며, `notion-page-record` hook이
@@ -88,7 +88,7 @@ echo '{"category":"spec-change","skill":"yeoboya-edit-task","workNo":"<작업번
 
 ## 6. 코드 재작성 (write-code 경유 + 델타 프레이밍)
 
-코드가 확정 범위에 있고 **코드 작업이 이미 착수됨**(`.workflow/<작업번호>/plan.md` 존재)일 때만 수행한다.
+코드가 확정 범위에 있고 **코드 과제가 이미 착수됨**(`.workflow/<과제번호>/plan.md` 존재)일 때만 수행한다.
 plan.md가 없으면(코드 미착수) 이 단계를 건너뛰고 "문서만 갱신됨 — 이후 코드 작성 시 갱신된 문서를
 반영한다"고 안내한다(코드 플래그 미변경).
 
@@ -97,7 +97,7 @@ plan.md가 없으면(코드 미착수) 이 단계를 건너뛰고 "문서만 갱
 
 ### 6.1 plan.md 수정 델타 재작성
 
-`.workflow/<작업번호>/plan.md`를 아래로 갈아끼운다(state-schema §2 고정 섹션 유지):
+`.workflow/<과제번호>/plan.md`를 아래로 갈아끼운다(state-schema §2 고정 섹션 유지):
 
 ```markdown
 ## 요구사항
@@ -117,7 +117,7 @@ plan.md가 없으면(코드 미착수) 이 단계를 건너뛰고 "문서만 갱
 <iOS | Android — workspace.platform 값 그대로>
 
 ## 커밋 규약
-이 작업의 모든 커밋은 `[<작업번호>]` prefix로 시작한다.
+이 과제의 모든 커밋은 `[<과제번호>]` prefix로 시작한다.
 ```
 
 ⚠️ `## 완료기준`은 반드시 `- [ ]` 체크리스트로 쓴다(하네스 `require-completion-criteria` 훅 대응).
@@ -125,10 +125,10 @@ plan.md가 없으면(코드 미착수) 이 단계를 건너뛰고 "문서만 갱
 
 ### 6.2 플래그 리셋
 
-`.workflow/<작업번호>/work.json`을 Read →
+`.workflow/<과제번호>/task.json`을 Read →
 - `codeWriteDone = false` (재작성 시작 — 완료 시 write-code가 다시 `true`로)
 - `codeReviewDone = false` (기존 리뷰가 무효화됨)
-- **`codeBaseSha`는 유지**(이 작업의 원본+델타 커밋이 하나의 리뷰/종결 단위)
+- **`codeBaseSha`는 유지**(이 과제의 원본+델타 커밋이 하나의 리뷰/종결 단위)
 
 → Write.
 
