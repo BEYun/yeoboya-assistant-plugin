@@ -1,9 +1,9 @@
 ---
-name: yeoboya-create-work
-description: "사용자가 /yeoboya-create-work <작업번호>를 호출하거나, 이 코드베이스에 새 feature/update/bugfix 작업을 만들려는 의도를 표현할 때('새 작업 시작', '기능 추가 시작', '버그 수정 작업 시작') 사용한다. 새 작업을 부트스트랩한다: 워크스페이스를 검증하고, workType을 명시적으로 묻고(추론 금지), .workflow/<작업번호>/work.json을 links: {} (빈 값)으로 생성하며, yeoboya-publish-notion을 통해 Notion 작업 DB row를 등록/갱신한다. workType은 절대 추론하지 말고 항상 묻는다. 병렬 작업은 항상 허용하며, 기존 work.json은 동일한 작업번호가 재사용될 때만 안전 게이트를 발동한다."
+name: yeoboya-create-task
+description: "사용자가 /yeoboya-create-task <작업번호>를 호출하거나, 이 코드베이스에 새 feature/update/bugfix 작업을 만들려는 의도를 표현할 때('새 작업 시작', '기능 추가 시작', '버그 수정 작업 시작') 사용한다. 새 작업을 부트스트랩한다: 워크스페이스를 검증하고, workType을 명시적으로 묻고(추론 금지), .workflow/<작업번호>/work.json을 links: {} (빈 값)으로 생성하며, yeoboya-publish-notion을 통해 Notion 작업 DB row를 등록/갱신한다. workType은 절대 추론하지 말고 항상 묻는다. 병렬 작업은 항상 허용하며, 기존 work.json은 동일한 작업번호가 재사용될 때만 안전 게이트를 발동한다."
 ---
 
-# yeoboya-create-work
+# yeoboya-create-task
 
 새 작업 부트스트랩. workType은 사용자가 명시 선택 (추론 금지).
 

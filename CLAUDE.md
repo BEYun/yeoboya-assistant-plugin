@@ -41,7 +41,7 @@
 
 ## 스킬 호출 규약
 
-- **user-invocable 진입은 5개**: `/yeoboya-setup-workspace`, `/yeoboya-create-work`, `/yeoboya-select-subtask`, `/yeoboya-insights`(마찰 로그 분석), `/yeoboya-edit-work`(변경 전파). 뒤 둘은 세부작업이 아닌 select-subtask 흐름 밖의 독립 도구다.
+- **user-invocable 진입은 5개**: `/yeoboya-setup-workspace`, `/yeoboya-create-task`, `/yeoboya-select-subtask`, `/yeoboya-insights`(마찰 로그 분석), `/yeoboya-edit-task`(변경 전파). 뒤 둘은 세부작업이 아닌 select-subtask 흐름 밖의 독립 도구다.
 - 세부작업 스킬은 모두 `user-invocable: false`. `select-subtask`이 Skill 도구로 trigger한다
 - **세부작업 단위 세션 분리 권장**: 세부작업 완료 후 새 세션에서 `/yeoboya-select-subtask` 재호출
 - **write-code 진입 게이트**: `select-subtask`이 write-code trigger 직전 `sync-links`로 links를 최신화한 뒤 필수 문서 집합(`{정책서, UI 흐름도, 데이터 흐름도}`)을 검사한다. **workType=feature는 하나라도 없으면 하드 블록**, update/bugfix는 경고 후 진행 가능.

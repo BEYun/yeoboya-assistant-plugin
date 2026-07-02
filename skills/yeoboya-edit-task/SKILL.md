@@ -1,10 +1,10 @@
 ---
-name: yeoboya-edit-work
-description: "사용자가 /yeoboya-edit-work를 호출하거나, 작업 진행 중 정책·흐름·명세가 바뀌었다고 알릴 때('정책이 바뀌었어', '흐름도 수정됐어', '명세 변경됐어', '이 내용 반영해줘', '변경 전파') 사용한다. 진행 중인 작업(activeWork)에 대해 변경 내용을 받아 정책서~QA 시나리오 중 영향 범위를 판단해 사용자에게 검토받고, 영향 문서를 의존 순서로 기존 문서 스킬을 재사용해 갱신하며, 코드가 영향받으면 write-code 경유로 재작성을 위임한다. 세부작업이 아니며 select-subtask 흐름 밖의 독립 도구다. 변경이 문서 하나라도 건드릴 수 있으면 임의 판단으로 넘기지 말고 이 스킬을 사용한다."
+name: yeoboya-edit-task
+description: "사용자가 /yeoboya-edit-task를 호출하거나, 작업 진행 중 정책·흐름·명세가 바뀌었다고 알릴 때('정책이 바뀌었어', '흐름도 수정됐어', '명세 변경됐어', '이 내용 반영해줘', '변경 전파') 사용한다. 진행 중인 작업(activeWork)에 대해 변경 내용을 받아 정책서~QA 시나리오 중 영향 범위를 판단해 사용자에게 검토받고, 영향 문서를 의존 순서로 기존 문서 스킬을 재사용해 갱신하며, 코드가 영향받으면 write-code 경유로 재작성을 위임한다. 세부작업이 아니며 select-subtask 흐름 밖의 독립 도구다. 변경이 문서 하나라도 건드릴 수 있으면 임의 판단으로 넘기지 말고 이 스킬을 사용한다."
 user-invocable: true
 ---
 
-# yeoboya-edit-work — 변경 전파 (문서~코드)
+# yeoboya-edit-task — 변경 전파 (문서~코드)
 
 작업 도중 바뀐 정책·흐름·명세를 **영향 범위 판단 → 문서 순차 갱신 → 코드 재작성 위임**으로 전파한다.
 기존 산출물을 수정하는 오케스트레이터이며, 각 문서 갱신·코드 구현은 기존 스킬(`yeoboya-write-*`,
@@ -59,7 +59,7 @@ user-invocable: true
 스펙 변경 빈도(상류 기획 불안정성)를 볼 수 있게 하기 위함이다. (도구 결함이 아니라 개선 신호다.)
 
 ```bash
-echo '{"category":"spec-change","skill":"yeoboya-edit-work","workNo":"<작업번호>","workType":"<workType>","severity":"friction","what":"<변경 델타 요약>","expected":"<확정 영향 문서 목록>","source":"agent"}' \
+echo '{"category":"spec-change","skill":"yeoboya-edit-task","workNo":"<작업번호>","workType":"<workType>","severity":"friction","what":"<변경 델타 요약>","expected":"<확정 영향 문서 목록>","source":"agent"}' \
   | node ${CLAUDE_PLUGIN_ROOT}/hooks/friction-log.js
 ```
 
