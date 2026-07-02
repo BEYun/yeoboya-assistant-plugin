@@ -6,7 +6,7 @@ const os = require('node:os');
 const { spawnSync } = require('node:child_process');
 
 function tmpRoot() { return fs.mkdtempSync(path.join(os.tmpdir(), 'yb-sync-links-')); }
-function workFile(root, w) { return path.join(root, '.workflow', w, 'work.json'); }
+function workFile(root, w) { return path.join(root, '.workflow', w, 'task.json'); }
 
 function setupWork(root, w, workData) {
   const wf = workFile(root, w);
@@ -23,7 +23,7 @@ function runCli(root, work, stdin) {
   });
 }
 
-test('syncs child titles into work.json.links and prints resolved links', () => {
+test('syncs child titles into task.json.links and prints resolved links', () => {
   const root = tmpRoot();
   const wf = setupWork(root, 'DCL-1', {});
   const r = runCli(root, 'DCL-1', [{ title: '정책서', id: 'p-pol' }, { title: '데이터 흐름도', id: 'p-df' }]);
@@ -35,7 +35,7 @@ test('syncs child titles into work.json.links and prints resolved links', () => 
   assert.equal(after.links['write-policy'], 'p-pol');
 });
 
-test('prints {} and exits 0 when work.json absent', () => {
+test('prints {} and exits 0 when task.json absent', () => {
   const root = tmpRoot();
   const r = runCli(root, 'DCL-MISSING', [{ title: '정책서', id: 'p' }]);
   assert.equal(r.status, 0);

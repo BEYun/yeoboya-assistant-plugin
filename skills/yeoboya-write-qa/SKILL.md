@@ -1,26 +1,26 @@
 ---
 name: yeoboya-write-qa
-description: "yeoboya-select-subtask이 이 세부 작업을 trigger할 때만 사용한다. 직접 호출 금지. 이전 산출물(UI 흐름도, 데이터 흐름도, write-code 커밋)로부터 QA 시나리오를 도출해 'QA 시나리오' Notion 데이터베이스(테이블)로 게시한다. 각 행은 하나의 테스트 케이스(속성: 케이스 ID·페르소나·카테고리·시나리오·관련 API / Socket·iOS 결과·Android 결과·Web 결과)이고, 행 본문에 사전 조건·테스트 단계·기대 결과를 정의한다. 케이스 ID는 페르소나→카테고리 순으로 부여해 ID 오름차순 정렬 시 페르소나·카테고리별로 묶이게 한다."
+description: "yeoboya-select-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. 이전 산출물(UI 흐름도, 데이터 흐름도, write-code 커밋)로부터 QA 시나리오를 도출해 'QA 시나리오' Notion 데이터베이스(테이블)로 게시한다. 각 행은 하나의 테스트 케이스(속성: 케이스 ID·페르소나·카테고리·시나리오·관련 API / Socket·iOS 결과·Android 결과·Web 결과)이고, 행 본문에 사전 조건·테스트 단계·기대 결과를 정의한다. 케이스 ID는 페르소나→카테고리 순으로 부여해 ID 오름차순 정렬 시 페르소나·카테고리별로 묶이게 한다."
 user-invocable: false
 ---
 
 # yeoboya-write-qa
 
-QA 시나리오 작성. 산출물은 마크다운 페이지가 아니라 **작업 row 자식 데이터베이스(테이블)** "QA 시나리오"다 — 행마다 한 테스트 케이스, 속성으로 필터·정렬·그룹핑이 가능하고 테스트 결과를 사람이 직접 채워 넣는다(참고 구조: DallaGame TC).
+QA 시나리오 작성. 산출물은 마크다운 페이지가 아니라 **과제 row 자식 데이터베이스(테이블)** "QA 시나리오"다 — 행마다 한 테스트 케이스, 속성으로 필터·정렬·그룹핑이 가능하고 테스트 결과를 사람이 직접 채워 넣는다(참고 구조: DallaGame TC).
 
 ## 1. 전제
 
-- work.json 존재.
-- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식(페이지·데이터베이스)을 `work.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물(QA 시나리오 DB)이 이미 있으면 publish가 append-only 재게시가 되어 중복 DB·행을 막는다.
+- task.json 존재.
+- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식(페이지·데이터베이스)을 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물(QA 시나리오 DB)이 이미 있으면 publish가 append-only 재게시가 되어 중복 DB·행을 막는다.
 
 ## 2. 입력 fetch
 
-- **도메인 명세서** (work.json.links['write-domain']) — §2 페르소나별 시나리오 / §3 전이규칙 `페르소나` 열에서 **페르소나 집합**을 추출한다(feature/update). 이 집합이 `페르소나` 컬럼 SELECT 옵션과 행 값의 단일 출처다.
-  - **bugfix**(도메인 명세서 없음): work.json.links['analyze-bug'](버그 분석)의 증상·재현 절차에 등장하는 행위 주체에서 페르소나를 도출한다(고정 카탈로그 없음).
+- **도메인 명세서** (task.json.links['write-domain']) — §2 페르소나별 시나리오 / §3 전이규칙 `페르소나` 열에서 **페르소나 집합**을 추출한다(feature/update). 이 집합이 `페르소나` 컬럼 SELECT 옵션과 행 값의 단일 출처다.
+  - **bugfix**(도메인 명세서 없음): task.json.links['analyze-bug'](버그 분석)의 증상·재현 절차에 등장하는 행위 주체에서 페르소나를 도출한다(고정 카탈로그 없음).
   - 도메인 명세서·버그 분석이 모두 없으면 사용자에게 경고하고 진행 여부를 확인한다.
 - UI 흐름도 (화면/사용자 액션 → 시나리오 도출의 출발점)
 - 데이터 흐름도 / 통신 명세서 (API 엔드포인트·Socket 이벤트 → `관련 API / Socket` 채움)
-- write-code 또는 fix-bug 커밋 (`git log --grep='[<작업번호>]'`) — 실제 구현된 동작 확인
+- write-code 또는 fix-bug 커밋 (`git log --grep='[<과제번호>]'`) — 실제 구현된 동작 확인
 
 ## 3. 테이블 스키마
 
@@ -99,7 +99,7 @@ CREATE TABLE (
 
 ```
 yeoboya-publish-notion 호출:
-  work: <작업번호>
+  work: <과제번호>
   mode: "dispatch-db"
   key: "write-qa"
   schema: <§3 DDL>
@@ -111,7 +111,7 @@ yeoboya-publish-notion 호출:
     - ...
 ```
 
-publish-notion이 신규면 DB 생성+행 추가 후 `sync-links`로 `links['write-qa']`(=DB id)를 기록하고, 재게시면 기존 케이스 ID는 보존(append-only)하고 새 케이스만 추가한다(§4.5). 본 스킬은 work.json·links를 직접 쓰지 않는다.
+publish-notion이 신규면 DB 생성+행 추가 후 `sync-links`로 `links['write-qa']`(=DB id)를 기록하고, 재게시면 기존 케이스 ID는 보존(append-only)하고 새 케이스만 추가한다(§4.5). 본 스킬은 task.json·links를 직접 쓰지 않는다.
 
 ## 8. 종료 안내
 
@@ -120,4 +120,4 @@ QA 시나리오 작성 완료. 다음 권장 단계: <다음 단계>.
 새 세션에서 /yeoboya-select-subtask을 호출하세요.
 ```
 
-`<다음 단계>`는 workType별로 채운다 (SUBTASK_GROUPS상 write-qa 다음 = "개발" 그룹): feature → "코드 작성", update → "코드 수정", bugfix → "버그 수정".
+`<다음 단계>`는 taskType별로 채운다 (SUBTASK_GROUPS상 write-qa 다음 = "개발" 그룹): feature → "코드 작성", update → "코드 수정", bugfix → "버그 수정".

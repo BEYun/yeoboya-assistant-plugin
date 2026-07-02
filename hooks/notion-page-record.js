@@ -5,7 +5,7 @@ const {
   isNotionWriteTool, resolveKey, extractPagesFromInput, extractPageIds, isMultiPageKey,
 } = require('./lib/notion');
 const { readStdin, allow, log } = require('./lib/hook-runtime');
-const { readActiveWork, recordLink } = require('./lib/work');
+const { readActiveTask, recordLink } = require('./lib/task');
 const { logFriction } = require('./lib/friction');
 
 (async () => {
@@ -33,9 +33,9 @@ const { logFriction } = require('./lib/friction');
     return allow();
   }
 
-  const work = readActiveWork(root);
+  const work = readActiveTask(root);
   if (!work) {
-    log({ hook: 'page-record', event: 'skip', reason: 'no-active-work' });
+    log({ hook: 'page-record', event: 'skip', reason: 'no-active-task' });
     return allow();
   }
 

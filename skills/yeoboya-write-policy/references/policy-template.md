@@ -1,8 +1,8 @@
-# 정책서 [작업번호]
+# 정책서 [과제번호]
 
 - 업로드 일시: YYYY-MM-DDTHH:mm:ssZ
 - 작업자: <담당자>
-- 이전 버전: <referenceWork 작업번호 + Notion 링크 | 코드베이스 (<경로>) | —>
+- 이전 버전: <referenceTask 과제번호 + Notion 링크 | 코드베이스 (<경로>) | —>
 
 ## 용어
 
@@ -82,11 +82,11 @@
 
 ## 변경 이력
 
-(workType=update 또는 재publish 시 1행 이상. 이전 버전 없이 코드베이스 산출이면 첫 행 `최초 작성`. — state-schema §6)
+(taskType=update 또는 재publish 시 1행 이상. 이전 버전 없이 코드베이스 산출이면 첫 행 `최초 작성`. — state-schema §6)
 
 | 일자 | 작업자 | 변경 요약 | 참고본 |
 |---|---|---|---|
-| YYYY-MM-DD | <작업자> | <이번 수정 요약 / 최초 작성> | <referenceWork 작업번호 / 코드베이스: <경로> / —> |
+| YYYY-MM-DD | <작업자> | <이번 수정 요약 / 최초 작성> | <referenceTask 과제번호 / 코드베이스: <경로> / —> |
 
 ## 배경
 

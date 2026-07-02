@@ -1,6 +1,6 @@
 ---
 name: yeoboya-write-policy
-description: "yeoboya-select-subtask이 이 세부 작업을 trigger할 때만 사용한다. 직접 호출 금지. Notion에서 참조된 기획서를 읽고, 검토 항목을 사용자와 함께 진행하며, references/policy-template.md로 정책서 markdown을 작성하고, 자체 검증을 실행한 뒤, title='정책서'로 yeoboya-publish-notion을 호출한다. notion-page-record hook이 pageId를 work.json.links에 자동으로 기록한다."
+description: "yeoboya-select-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. Notion에서 참조된 기획서를 읽고, 검토 항목을 사용자와 함께 진행하며, references/policy-template.md로 정책서 markdown을 작성하고, 자체 검증을 실행한 뒤, title='정책서'로 yeoboya-publish-notion을 호출한다. notion-page-record hook이 pageId를 task.json.links에 자동으로 기록한다."
 user-invocable: false
 ---
 
@@ -10,15 +10,15 @@ user-invocable: false
 
 ## 1. 전제
 
-- work.json 존재.
-- 기획서 검토 산출물(work.json.links['write-policy-feedback'])이 있으면 입력으로 활용한다. 없으면 사용자에게 알리고 계속 진행할지 확인한다 (강제 종료 없음).
-- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식 페이지를 `work.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
+- task.json 존재.
+- 기획서 검토 산출물(task.json.links['write-policy-feedback'])이 있으면 입력으로 활용한다. 없으면 사용자에게 알리고 계속 진행할지 확인한다 (강제 종료 없음).
+- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
 
 ## 2. 입력 fetch
 
-1. Notion에서 작업 DB row 조회 (yeoboya-publish-notion mode=sync) → 작업명/도메인/담당자 등 보조 정보
-2. **기획서 검토 페이지 fetch** (`work.json.links['write-policy-feedback']` → notion-fetch)
-3. **workType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 정책서를 해석한다(자기 재publish, 또는 `referenceWork`의 정책서를 Notion 권위 출처로 해석). **후보 있음(분기 A)** → fetch해 수정의 출발점으로. **후보 없음(분기 B)** → §6대로 사용자에게 기준 모듈/파일 경로를 요청해 코드베이스 기반으로 산출. provenance(이전 버전 출처)는 §6 표대로 메타 블록 + 변경 이력에 기록.
+1. Notion에서 과제 DB row 조회 (yeoboya-publish-notion mode=sync) → 과제명/도메인/담당자 등 보조 정보
+2. **기획서 검토 페이지 fetch** (`task.json.links['write-policy-feedback']` → notion-fetch)
+3. **taskType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 정책서를 해석한다(자기 재publish, 또는 `referenceTask`의 정책서를 Notion 권위 출처로 해석). **후보 있음(분기 A)** → fetch해 수정의 출발점으로. **후보 없음(분기 B)** → §6대로 사용자에게 기준 모듈/파일 경로를 요청해 코드베이스 기반으로 산출. provenance(이전 버전 출처)는 §6 표대로 메타 블록 + 변경 이력에 기록.
 
 ## 3. 작성 절차
 
@@ -29,7 +29,7 @@ user-invocable: false
 2. **본문 작성** — `references/policy-template.md` 구조 그대로 9 섹션 (용어/페르소나/파라미터/정책 카탈로그/예외·롤백/변경 이력/배경/측정 지표/원본 자료).
    - POL-NNN ID는 등록 순번. 카테고리는 도메인별 자유 정의.
    - 예외·롤백 동작 유형은 template 6종 (Auto-Fallback / Toast Notice / Invalidation / Deferral / Early Settlement / Non-Participation) 외 신규 카테고리 추가 가능.
-3. **변경 이력** (`references/state-schema.md §6`) — 이전 버전이 있으면(workType=update 또는 재publish) §변경 이력에 이번 수정 1행 추가. 이전 버전 없이 신규로 진행한 경우 첫 행을 `최초 작성`으로 기록.
+3. **변경 이력** (`references/state-schema.md §6`) — 이전 버전이 있으면(taskType=update 또는 재publish) §변경 이력에 이번 수정 1행 추가. 이전 버전 없이 신규로 진행한 경우 첫 행을 `최초 작성`으로 기록.
 
 ## 4. Self-validation (publish 직전)
 
@@ -42,7 +42,7 @@ user-invocable: false
 - [ ] §정책 카탈로그의 모든 POL 행이 `예외` 컬럼 명시 (예외 없으면 "—")
 - [ ] §예외/롤백 동작 유형 분류 1개 이상 (해당 없으면 "해당 없음" 명시) — 각 분류는 트리거/동작/메시지 3열 표
 - [ ] §변경 이력 1행 이상 (분기 A 이번 변경 / 분기 B 코드베이스 산출 시 첫 행 `최초 작성` — state-schema §6)
-- [ ] provenance — 메타 "이전 버전" + 변경 이력 `참고본`이 §6 표와 일치 (referenceWork 번호 / `코드베이스: <경로>` / `—`)
+- [ ] provenance — 메타 "이전 버전" + 변경 이력 `참고본`이 §6 표와 일치 (referenceTask 번호 / `코드베이스: <경로>` / `—`)
 - [ ] §원본 자료 1개 이상
 
 실패 시 사용자에게 누락 항목 안내 후 보완.
@@ -51,14 +51,14 @@ user-invocable: false
 
 ```
 yeoboya-publish-notion 호출:
-  work: <작업번호>
+  work: <과제번호>
   mode: "dispatch"
   key: "write-policy"
   markdown: <위에서 작성한 마크다운>
-  properties: { workType: <workType>, 작업명: <name>, 도메인: <도메인 or 생략> }
+  properties: { taskType: <taskType>, 과제명: <name>, 도메인: <도메인 or 생략> }
 ```
 
-publish 후 notion-page-record hook이 work.json.links['write-policy']에 pageId를 자동 기록.
+publish 후 notion-page-record hook이 task.json.links['write-policy']에 pageId를 자동 기록.
 
 ## 6. 종료 안내
 

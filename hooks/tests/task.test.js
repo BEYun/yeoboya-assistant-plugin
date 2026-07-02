@@ -4,33 +4,33 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 
-const work = require('../lib/work');
+const task = require('../lib/task');
 
 function tmpRoot() { return fs.mkdtempSync(path.join(os.tmpdir(), 'yb-work-')); }
 function workspaceFile(root) { return path.join(root, '.workflow', 'workspace.json'); }
-function workFile(root, w) { return path.join(root, '.workflow', w, 'work.json'); }
+function workFile(root, w) { return path.join(root, '.workflow', w, 'task.json'); }
 
-test('readActiveWork returns null when workspace.json absent', () => {
-  assert.equal(work.readActiveWork(tmpRoot()), null);
+test('readActiveTask returns null when workspace.json absent', () => {
+  assert.equal(task.readActiveTask(tmpRoot()), null);
 });
 
-test('readActiveWork returns activeWork value', () => {
+test('readActiveTask returns activeTask value', () => {
   const root = tmpRoot();
   fs.mkdirSync(path.dirname(workspaceFile(root)), { recursive: true });
-  fs.writeFileSync(workspaceFile(root), JSON.stringify({ activeWork: 'DCL-1234' }));
-  assert.equal(work.readActiveWork(root), 'DCL-1234');
+  fs.writeFileSync(workspaceFile(root), JSON.stringify({ activeTask: 'DCL-1234' }));
+  assert.equal(task.readActiveTask(root), 'DCL-1234');
 });
 
-test('readWork returns null when work.json absent', () => {
-  assert.equal(work.readWork(tmpRoot(), 'DCL-X'), null);
+test('readTask returns null when task.json absent', () => {
+  assert.equal(task.readTask(tmpRoot(), 'DCL-X'), null);
 });
 
-test('readWork parses work.json', () => {
+test('readTask parses task.json', () => {
   const root = tmpRoot();
   const f = workFile(root, 'DCL-1234');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-1234', links: {} }));
-  assert.equal(work.readWork(root, 'DCL-1234').work, 'DCL-1234');
+  assert.equal(task.readTask(root, 'DCL-1234').work, 'DCL-1234');
 });
 
 test('recordLink writes single pageId into links[key]', () => {
@@ -38,13 +38,13 @@ test('recordLink writes single pageId into links[key]', () => {
   const f = workFile(root, 'DCL-1234');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-1234', links: {} }));
-  assert.equal(work.recordLink(root, 'DCL-1234', 'write-policy', 'p-1'), true);
+  assert.equal(task.recordLink(root, 'DCL-1234', 'write-policy', 'p-1'), true);
   const after = JSON.parse(fs.readFileSync(f, 'utf8'));
   assert.equal(after.links['write-policy'], 'p-1');
 });
 
-test('recordLink returns false when work.json absent', () => {
-  assert.equal(work.recordLink(tmpRoot(), 'DCL-X', 'write-policy', 'p-1'), false);
+test('recordLink returns false when task.json absent', () => {
+  assert.equal(task.recordLink(tmpRoot(), 'DCL-X', 'write-policy', 'p-1'), false);
 });
 
 test('recordLink initializes links when missing', () => {
@@ -52,7 +52,7 @@ test('recordLink initializes links when missing', () => {
   const f = workFile(root, 'DCL-1234');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-1234' }));
-  work.recordLink(root, 'DCL-1234', 'write-policy', 'p-1');
+  task.recordLink(root, 'DCL-1234', 'write-policy', 'p-1');
   assert.equal(JSON.parse(fs.readFileSync(f, 'utf8')).links['write-policy'], 'p-1');
 });
 
@@ -61,8 +61,8 @@ test('recordLink multi-page accumulates { title: pageId }', () => {
   const f = workFile(root, 'DCL-1');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-1', links: {} }));
-  work.recordLink(root, 'DCL-1', 'draw-data-flow', 'p-1', { title: '데이터 흐름도' });
-  work.recordLink(root, 'DCL-1', 'draw-data-flow', 'p-2', { title: '통신 명세서' });
+  task.recordLink(root, 'DCL-1', 'draw-data-flow', 'p-1', { title: '데이터 흐름도' });
+  task.recordLink(root, 'DCL-1', 'draw-data-flow', 'p-2', { title: '통신 명세서' });
   const after = JSON.parse(fs.readFileSync(f, 'utf8'));
   assert.deepEqual(after.links['draw-data-flow'], { '데이터 흐름도': 'p-1', '통신 명세서': 'p-2' });
 });
@@ -72,8 +72,8 @@ test('recordLink versioned write-policy-feedback accumulates { title: pageId } p
   const f = workFile(root, 'DCL-PF');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-PF', links: {} }));
-  work.recordLink(root, 'DCL-PF', 'write-policy-feedback', 'p-v6', { title: '기획서 검토 - v0.6' });
-  work.recordLink(root, 'DCL-PF', 'write-policy-feedback', 'p-v7', { title: '기획서 검토 - v0.7' });
+  task.recordLink(root, 'DCL-PF', 'write-policy-feedback', 'p-v6', { title: '기획서 검토 - v0.6' });
+  task.recordLink(root, 'DCL-PF', 'write-policy-feedback', 'p-v7', { title: '기획서 검토 - v0.7' });
   const after = JSON.parse(fs.readFileSync(f, 'utf8'));
   assert.deepEqual(after.links['write-policy-feedback'], {
     '기획서 검토 - v0.6': 'p-v6',
@@ -86,7 +86,7 @@ test('syncLinks accumulates versioned write-policy-feedback pages keyed by full 
   const f = workFile(root, 'DCL-PF2');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-PF2', links: {} }));
-  const links = work.syncLinks(root, 'DCL-PF2', [
+  const links = task.syncLinks(root, 'DCL-PF2', [
     { title: '기획서 검토 - v0.6', id: 'p-v6' },
     { title: '기획서 검토 - v0.7', id: 'p-v7' },
   ]);
@@ -101,7 +101,7 @@ test('syncLinks maps child titles to keys and writes links', () => {
   const f = workFile(root, 'DCL-2');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-2', links: {} }));
-  const links = work.syncLinks(root, 'DCL-2', [
+  const links = task.syncLinks(root, 'DCL-2', [
     { title: '정책서', id: 'p-pol' },
     { title: 'UI 흐름도', id: 'p-ui' },
   ]);
@@ -116,7 +116,7 @@ test('syncLinks accumulates multi-page draw-data-flow', () => {
   const f = workFile(root, 'DCL-3');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-3', links: {} }));
-  const links = work.syncLinks(root, 'DCL-3', [
+  const links = task.syncLinks(root, 'DCL-3', [
     { title: '데이터 흐름도', id: 'p-df' },
     { title: '통신 명세서', id: 'p-cs' },
   ]);
@@ -128,7 +128,7 @@ test('syncLinks preserves unmatched existing keys and skips unknown titles', () 
   const f = workFile(root, 'DCL-4');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-4', links: { 'write-qa': 'p-qa' } }));
-  const links = work.syncLinks(root, 'DCL-4', [
+  const links = task.syncLinks(root, 'DCL-4', [
     { title: '정책서', id: 'p-pol' },
     { title: '엉뚱한 제목', id: 'p-x' },
   ]);
@@ -137,8 +137,8 @@ test('syncLinks preserves unmatched existing keys and skips unknown titles', () 
   assert.equal(links['엉뚱한 제목'], undefined);
 });
 
-test('syncLinks returns null when work.json absent', () => {
-  assert.equal(work.syncLinks(tmpRoot(), 'DCL-X', [{ title: '정책서', id: 'p' }]), null);
+test('syncLinks returns null when task.json absent', () => {
+  assert.equal(task.syncLinks(tmpRoot(), 'DCL-X', [{ title: '정책서', id: 'p' }]), null);
 });
 
 test('syncLinks ignores children without id', () => {
@@ -146,7 +146,7 @@ test('syncLinks ignores children without id', () => {
   const f = workFile(root, 'DCL-5');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-5', links: {} }));
-  const links = work.syncLinks(root, 'DCL-5', [{ title: '정책서' }, { title: 'UI 흐름도', id: 'p-ui' }]);
+  const links = task.syncLinks(root, 'DCL-5', [{ title: '정책서' }, { title: 'UI 흐름도', id: 'p-ui' }]);
   assert.equal(links['write-policy'], undefined);
   assert.equal(links['draw-ui-flow'], 'p-ui');
 });
@@ -156,7 +156,7 @@ test('syncLinks replaces a stale string at a multi-page key with a {title:id} ma
   const f = workFile(root, 'DCL-6');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-6', links: { 'draw-data-flow': 'stale-string' } }));
-  const links = work.syncLinks(root, 'DCL-6', [{ title: '데이터 흐름도', id: 'p-df' }]);
+  const links = task.syncLinks(root, 'DCL-6', [{ title: '데이터 흐름도', id: 'p-df' }]);
   assert.deepEqual(links['draw-data-flow'], { '데이터 흐름도': 'p-df' });
 });
 
@@ -165,6 +165,6 @@ test('syncLinks overwrites a stale object at a single-page key with a string', (
   const f = workFile(root, 'DCL-7');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ work: 'DCL-7', links: { 'write-policy': { weird: 'obj' } } }));
-  const links = work.syncLinks(root, 'DCL-7', [{ title: '정책서', id: 'p-pol' }]);
+  const links = task.syncLinks(root, 'DCL-7', [{ title: '정책서', id: 'p-pol' }]);
   assert.equal(links['write-policy'], 'p-pol');
 });

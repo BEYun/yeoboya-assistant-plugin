@@ -1,6 +1,6 @@
 ---
 name: yeoboya-draw-ui-flow
-description: "yeoboya-select-subtask이 이 세부 작업을 trigger할 때만 사용한다. 직접 호출 금지. 고유 ID를 가진 화면, 화면별 고유 ID를 가진 사용자 액션, 그리고 화면 전환 다이어그램을 정의한다. 모든 화면-액션 쌍이 ID를 갖는지 자체 검증한다(draw-data-flow가 ID 기반 연결에 사용). 'UI 흐름도' 제목의 Notion 페이지를 게시한다."
+description: "yeoboya-select-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. 고유 ID를 가진 화면, 화면별 고유 ID를 가진 사용자 액션, 그리고 화면 전환 다이어그램을 정의한다. 모든 화면-액션 쌍이 ID를 갖는지 자체 검증한다(draw-data-flow가 ID 기반 연결에 사용). 'UI 흐름도' 제목의 Notion 페이지를 게시한다."
 user-invocable: false
 ---
 
@@ -10,14 +10,14 @@ UI 흐름도 작성. **화면(screen)과 사용자 액션(user action)을 ID로 
 
 ## 1. 전제
 
-- work.json 존재.
-- 도메인 명세서(work.json.links['write-domain'])가 있으면 참고한다. 없으면 사용자에게 알리고 진행 여부를 확인한다.
-- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식 페이지를 `work.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
+- task.json 존재.
+- 도메인 명세서(task.json.links['write-domain'])가 있으면 참고한다. 없으면 사용자에게 알리고 진행 여부를 확인한다.
+- **진입 시 sync (필수 첫 동작)**: `yeoboya-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
 
 ## 2. 입력 fetch
 
 - 도메인 명세서 + 정책서 fetch
-- **workType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 UI 흐름도를 해석한다(자기 재publish, 또는 `referenceWork`의 UI 흐름도를 Notion 권위 출처로 해석). **후보 있음(분기 A)** → fetch. **후보 없음(분기 B)** → §6대로 기준 모듈/파일 경로를 사용자에게 요청해 코드베이스 기반 산출. provenance는 §6 표대로 헤더 + 변경 이력에 기록.
+- **taskType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 UI 흐름도를 해석한다(자기 재publish, 또는 `referenceTask`의 UI 흐름도를 Notion 권위 출처로 해석). **후보 있음(분기 A)** → fetch. **후보 없음(분기 B)** → §6대로 기준 모듈/파일 경로를 사용자에게 요청해 코드베이스 기반 산출. provenance는 §6 표대로 헤더 + 변경 이력에 기록.
 
 ## 3. 작성 절차
 
@@ -31,7 +31,7 @@ UI 흐름도 작성. **화면(screen)과 사용자 액션(user action)을 ID로 
    c. **화면·액션 통합 표** — 열: `화면 ID | 화면 (채널) | 주요 UI 상태 | 사용자 액션 (ID · 단계)`. 화면 목록·화면별 UI 상태·사용자 액션 정의를 이 한 표로 병합한다.
 6. **§2 정책 인용 표** — 다이어그램 강조 영역(트리거, 게이트, 토스트 등)에 대해 POL-XXX 출처 + 원문 인용.
 7. **정책서 미정 항목** — 다이어그램 unclear 노드를 종합한 목록(없으면 "현재 없음").
-8. **변경 이력** (workType=update, `references/state-schema.md §6`) — 이전 버전이 있으면 1행 추가, 이전 버전 없이 신규면 첫 행을 `최초 작성`으로 기록.
+8. **변경 이력** (taskType=update, `references/state-schema.md §6`) — 이전 버전이 있으면 1행 추가, 이전 버전 없이 신규면 첫 행을 `최초 작성`으로 기록.
 
 본문 구조는 `references/ui-flow-template.md`를 직접 따른다.
 
@@ -49,14 +49,14 @@ UI 흐름도 작성. **화면(screen)과 사용자 액션(user action)을 ID로 
 - [ ] 다이어그램에 4종 classDef(error/unclear/auth/system) 모두 정의
 - [ ] §2 정책 인용 표가 다이어그램에 등장하는 POL-XXX 모두 커버
 - [ ] 정책서 미정 항목이 명시되거나 "현재 없음"
-- [ ] (workType=update) 변경 이력 1행 이상 (분기 B 코드베이스 산출 시 첫 행 `최초 작성`)
-- [ ] (workType=update) provenance — 헤더 "이전 버전" + 변경 이력 `참고본`이 `references/state-schema.md §6` 표와 일치 (referenceWork 번호 / `코드베이스: <경로>` / `—`)
+- [ ] (taskType=update) 변경 이력 1행 이상 (분기 B 코드베이스 산출 시 첫 행 `최초 작성`)
+- [ ] (taskType=update) provenance — 헤더 "이전 버전" + 변경 이력 `참고본`이 `references/state-schema.md §6` 표와 일치 (referenceTask 번호 / `코드베이스: <경로>` / `—`)
 
 ## 5. publish
 
 ```
 yeoboya-publish-notion 호출:
-  work: <작업번호>
+  work: <과제번호>
   mode: "dispatch"
   key: "draw-ui-flow"
   markdown: <본문>

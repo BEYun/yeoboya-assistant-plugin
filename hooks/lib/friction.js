@@ -38,7 +38,7 @@ function logFriction(root, event) {
       sessionId: event.sessionId ?? null,
       skill: event.skill ?? null,
       workNo: event.workNo ?? null,
-      workType: event.workType ?? null,
+      taskType: event.taskType ?? null,
       category: VALID_CATEGORY.has(event.category) ? event.category : 'tool-error',
       severity: VALID_SEVERITY.has(event.severity) ? event.severity : 'friction',
       what: String(event.what ?? '').slice(0, 500),

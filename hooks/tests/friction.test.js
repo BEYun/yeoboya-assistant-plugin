@@ -36,7 +36,7 @@ test('invalid category/severity fall back to safe defaults', () => {
 
 test('spec-change is a valid category (edit-work 변경 전파 기록)', () => {
   const root = tmpRoot();
-  logFriction(root, { category: 'spec-change', skill: 'yeoboya-edit-work', what: '검색 필터에 지역 조건 추가', source: 'agent' });
+  logFriction(root, { category: 'spec-change', skill: 'yeoboya-edit-task', what: '검색 필터에 지역 조건 추가', source: 'agent' });
   const [e] = readFrictionLog(root);
   assert.equal(e.category, 'spec-change');
   assert.equal(e.source, 'agent');

@@ -2,7 +2,7 @@
 'use strict';
 
 const { readStdin, log } = require('./hook-runtime');
-const { syncLinks } = require('./work');
+const { syncLinks } = require('./task');
 const { logFriction } = require('./friction');
 
 function out(obj) {
@@ -31,7 +31,7 @@ function out(obj) {
   const links = syncLinks(root, work, children);
   if (links === null) {
     log({ hook: 'sync-links', event: 'skip', reason: 'no-work-json', work });
-    logFriction(root, { skill: 'yeoboya-publish-notion', workNo: work, category: 'schema-mismatch', severity: 'friction', what: 'work.json 없음 — links 동기화 불가', source: 'hook' });
+    logFriction(root, { skill: 'yeoboya-publish-notion', workNo: work, category: 'schema-mismatch', severity: 'friction', what: 'task.json 없음 — links 동기화 불가', source: 'hook' });
     return out({});
   }
   log({ hook: 'sync-links', event: 'sync', work, count: children.length });

@@ -12,10 +12,10 @@ function tmpRoot() { return fs.mkdtempSync(path.join(os.tmpdir(), 'yb-page-recor
 function setupWork(root, workData) {
   const ws = path.join(root, '.workflow', 'workspace.json');
   fs.mkdirSync(path.dirname(ws), { recursive: true });
-  fs.writeFileSync(ws, JSON.stringify({ activeWork: 'DCL-1234' }));
-  const wf = path.join(root, '.workflow', 'DCL-1234', 'work.json');
+  fs.writeFileSync(ws, JSON.stringify({ activeTask: 'DCL-1234' }));
+  const wf = path.join(root, '.workflow', 'DCL-1234', 'task.json');
   fs.mkdirSync(path.dirname(wf), { recursive: true });
-  fs.writeFileSync(wf, JSON.stringify({ work: 'DCL-1234', workType: 'feature', links: {}, ...workData }));
+  fs.writeFileSync(wf, JSON.stringify({ work: 'DCL-1234', taskType: 'feature', links: {}, ...workData }));
   return wf;
 }
 
@@ -58,7 +58,7 @@ test('does not record when title is unknown', () => {
   assert.deepEqual(after.links, {});
 });
 
-test('skips silently when no activeWork', () => {
+test('skips silently when no activeTask', () => {
   const root = tmpRoot();
   const inp = createPagesPayload([{ title: '정책서', markdown: '...' }]);
   const result = runHook(root, { ...inp, tool_response: createPagesResponse(['p-x']) });
