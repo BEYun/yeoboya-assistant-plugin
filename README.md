@@ -1,6 +1,8 @@
 # solution-assistant
 
-> 솔루션개발부 업무 보조 플러그인. 5개 서비스(달라 · 클럽라이브 · 여보야 · 클럽5678 · AI식단) × iOS/Android × feature/update/bugfix. 과제 하나의 전 과정(기획서 검토 → 코드 → 리뷰 → QA → 종결)을 세부작업 단위로 안내하고 산출물을 Notion에 축적한다.
+> **솔루션개발부 업무 보조 플러그인** — 5개 서비스(달라 · 클럽라이브 · 여보야 · 클럽5678 · AI식단) × iOS/Android × feature/update/bugfix.
+>
+> 과제 하나의 전 과정(기획서 검토 → 코드 → 리뷰 → QA → 종결)을 세부작업 단위로 안내하고, 산출물을 Notion에 축적한다.
 
 ## 설치
 
@@ -17,9 +19,18 @@
 ```bash
 /plugin marketplace add <이 저장소 경로 또는 git URL>
 /plugin install solution-assistant@solution-marketplace
+/plugin install solution-harness@solution-marketplace   # 필수 선행조건 — 같은 마켓플레이스에 카탈로그됨
 ```
 
-**3. Project Scope로 설치** — 과제별 로컬 상태(`.assistant/`)와 repo 하네스 문서를 대상으로 동작하므로 **관리 대상 repo에 project scope로 설치**한다. 설치 후 `/solution-setup`을 먼저 실행한다.
+> `superpowers`와 Notion MCP는 외부 소스라 별도로 설치한다(이 마켓플레이스엔 없음).
+
+**3. Project Scope로 설치** — `.assistant/`(로컬 상태)와 repo 하네스 문서를 대상으로 동작하므로 **관리 대상 repo에 project scope**로 설치한다.
+
+`/plugin` 실행 → **Marketplaces** 탭 → `solution-marketplace`에서 `solution-assistant` 선택 → **project scope**(*Install for all collaborators on this repository*) 선택.
+
+![project scope로 solution-assistant 설치](assets/install-project-scope.png)
+
+설치 후 `/solution-setup`을 먼저 실행한다.
 
 ## 용어
 
@@ -28,7 +39,11 @@
 
 ## 프로젝트 초기설정
 
-`/solution-setup`으로 워크스페이스를 초기화한다. 3대 선행조건(Notion MCP · superpowers · 하네스)을 검증하고, 서비스 · 플랫폼(iOS/Android) · 작업자 · Notion 과제 DB를 수집해 `.assistant/workspace.json`에 기록하며, 현재 repo의 하네스 부트스트랩(루트 문서 존재)을 확인한다. 다른 스킬을 쓰기 전 **반드시 먼저 실행**한다.
+`/solution-setup`으로 워크스페이스를 초기화한다 — **다른 스킬을 쓰기 전 반드시 먼저 실행**.
+
+- **검증** — 3대 선행조건(Notion MCP · superpowers · 하네스)
+- **수집** — 서비스 · 플랫폼(iOS/Android) · 작업자 · Notion 과제 DB → `.assistant/workspace.json`에 기록
+- **확인** — 현재 repo의 하네스 부트스트랩(루트 문서 존재)
 
 ```mermaid
 flowchart TD
@@ -36,7 +51,7 @@ flowchart TD
 
     P -->|누락| X["안내 후 종료<br/>(설치 뒤 재호출)"]
 
-    P -->|통과| BS{"하네스 부트스트랩?<br/>CLAUDE.md · CONVENTIONS.md · TESTING.md"}
+    P -->|통과| BS{"하네스 부트스트랩?<br/>CLAUDE.md · docs/CONVENTIONS.md · docs/rules/TESTING.md"}
 
     BS -->|미완| BSN["harness-root 안내<br/>bootstrapped = false"]
 
@@ -92,6 +107,8 @@ flowchart TD
 
 ## 전체 흐름
 
+> 🟦 직접 호출 진입점 · 🟨 하드 게이트(선행 문서·플래그 필요) · ⬜ 세부작업
+
 ```mermaid
 flowchart TD
     A["① /solution-setup"] --> B["② /solution-create-task<br/>taskType 지정"]
@@ -108,14 +125,14 @@ flowchart TD
         direction TB
         f1["기획: 기획서 검토 → 정책서"] --> f2["설계: 도메인 · UI 흐름도<br/>데이터 흐름도 · QA 시나리오"]
 
-        f2 --> f3["개발: 코드 작성 → 코드 리뷰"]
+        f2 --> f3["개발: 코드 작성 → 코드 리뷰<br/>🟨 흐름도 3종·codeWriteDone·codeReviewDone 게이트"]
 
         f3 --> f4["QA 대응: QA 버그 수정"]
     end
 
     subgraph BG["bugfix"]
         direction TB
-        b1["진단: 버그 분석 · QA 시나리오"] --> b2["개발: 버그 수정 → 코드 리뷰"]
+        b1["진단: 버그 분석 · QA 시나리오"] --> b2["개발: 버그 수정 → 코드 리뷰<br/>🟨 codeWriteDone·codeReviewDone 게이트"]
 
         b2 --> b3["QA 대응: QA 버그 수정"]
     end
@@ -127,19 +144,39 @@ flowchart TD
     EDIT["/solution-edit-task"] -. 진행 중 변경 .-> C
 
     classDef entry fill:#2d6cdf,stroke:#1b4aa0,color:#fff;
+    classDef gate fill:#fff3cd,stroke:#d39e00,color:#5c4500;
     class A,B,C,Z entry;
+    class f3,b2 gate;
 ```
 
-## 노션 산출물
+## 세부작업 지도
 
-| 세부작업 | 스킬 키 | Notion 산출물 | 형태 | taskType |
-|---|---|---|---|---|
-| 기획서 검토 | `write-policy-feedback` | `기획서 검토 - <버전>` | 페이지 (버전마다 누적) | feature · update |
-| 정책서 | `write-policy` | `정책서` | 단일 페이지 | feature · update |
-| 도메인 명세서 | `write-domain` | `도메인 명세서` | 단일 페이지 | feature · update |
-| UI 흐름도 | `draw-ui-flow` | `UI 흐름도` | 단일 페이지 | feature · update |
-| 데이터 흐름도 | `draw-data-flow` | `데이터 흐름도` + `통신 명세서` | 다중 페이지 | feature · update |
-| 버그 분석 | `analyze-bug` | `버그 분석` | 단일 페이지 | bugfix |
-| QA 시나리오 | `write-qa` | `QA 시나리오` | 데이터베이스 (행 = 테스트 케이스) | 전체 |
+과제 유형별 세부작업 전체와 산출물. 완료 판정은 문서형은 `task.json.links` 키 존재, 코드형은 플래그(`codeWriteDone`/`codeReviewDone`)로 한다.
 
-> 문서 스킬은 진입 시 `sync-links`로 `task.json.links`를 Notion 과제 row 자식 페이지와 동기화한다. 스키마·상수 정본: [`references/state-schema.md`](references/state-schema.md), [`hooks/lib/constants.json`](hooks/lib/constants.json).
+**feature · update** (라벨: feature → update)
+
+| 그룹 | 세부작업 | 스킬 키 | 산출물 |
+|---|---|---|---|
+| 기획 | 기획서 검토 | `write-policy-feedback` | Notion `기획서 검토 - <버전>` (버전마다 누적) |
+| 기획 | 정책서 작성 → 수정 | `write-policy` | Notion `정책서` (단일) |
+| 설계 | 도메인 명세서 (→ 수정) | `write-domain` | Notion `도메인 명세서` (단일) |
+| 설계 | UI 흐름도 (→ 수정) | `draw-ui-flow` | Notion `UI 흐름도` (단일) |
+| 설계 | 데이터 흐름도 (→ 수정) | `draw-data-flow` | Notion `데이터 흐름도` + `통신 명세서` (다중) |
+| 설계 | QA 시나리오 | `write-qa` | Notion DB (행 = 테스트 케이스) |
+| 개발 | 코드 작성 → 코드 수정 | `write-code` | 코드 (하네스 `work` 위임) · Notion 없음 → `codeWriteDone` 🟨 |
+| 개발 | 코드 리뷰 | `review-code` | 리뷰 → `codeReviewDone` 🟨 |
+| QA 대응 | QA 버그 수정 | `fix-qa-bug` | 코드 |
+| 종결 | 과제 종결 | `finish-task` | Notion 작업 DB iOS/Android 완료 토글 🟨 |
+
+**bugfix** (기획·설계 없음)
+
+| 그룹 | 세부작업 | 스킬 키 | 산출물 |
+|---|---|---|---|
+| 진단 | 버그 분석 | `analyze-bug` | Notion `버그 분석` (단일) |
+| 진단 | QA 시나리오 | `write-qa` | Notion DB (행 = 테스트 케이스) |
+| 개발 | 버그 수정 | `fix-bug` | 코드 → `codeWriteDone` 🟨 |
+| 개발 | 코드 리뷰 | `review-code` | 리뷰 → `codeReviewDone` 🟨 |
+| QA 대응 | QA 버그 수정 | `fix-qa-bug` | 코드 |
+| 종결 | 과제 종결 | `finish-task` | Notion 작업 DB iOS/Android 완료 토글 🟨 |
+
+> 🟨 = 하드 게이트 근거 플래그. 문서 스킬은 진입 시 `sync-links`로 `task.json.links`를 Notion 과제 row 자식 페이지와 동기화한다. 스키마·상수 정본: [`references/state-schema.md`](references/state-schema.md), [`hooks/lib/constants.json`](hooks/lib/constants.json).
