@@ -202,4 +202,4 @@ trigger 전:
 - 대상이 `write-code`이면 §6.1 절차(sync-links 실행 → 필수 집합 검사)를 수행했는지 검증. feature인데 필수 3종이 동기화된 links에 모두 존재하지 않으면 trigger 금지.
 - 대상이 `write-qa`이고 `taskType=bugfix`이면 §6.2 경고를 거쳤는지 검증.
 - 대상이 `review-code`이면 §5 코드 리뷰 전용 선행 확인(`codeWriteDone === true`)을 수행했는지 검증. `false`/부재면 trigger 금지.
-- 대상이 `finish-work`이면 §5 과제 종결 전용 선행 확인(`codeReviewDone === true`)을 수행했는지 검증.
+- 대상이 `finish-task`이면 §5 과제 종결 전용 선행 확인(`codeReviewDone === true`)을 수행했는지 검증.

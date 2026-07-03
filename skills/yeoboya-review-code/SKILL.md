@@ -81,7 +81,7 @@ yeoboya-publish-notion 호출:
 
 `.assistant/<과제번호>/task.json`을 Read → `codeReviewDone` 필드를 `true`로 설정 → Write.
 
-이 단계를 건너뛰면 `finish-work` 진입이 영구 차단된다.
+이 단계를 건너뛰면 `finish-task` 진입이 영구 차단된다.
 
 ## 7. 종료 안내
 

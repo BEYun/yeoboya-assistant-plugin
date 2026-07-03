@@ -21,7 +21,7 @@
 | 과제 메타데이터 + Notion 문서 링크 (taskType 라벨, `links` — 작성자 무관 문서 존재의 로컬 캐시) | 로컬 `.assistant/<과제번호>/task.json` (권위 출처는 Notion 과제 row 자식 페이지) |
 | write-code 코드 과제 계획서 | 로컬 `.assistant/<과제번호>/plan.md` (write-code 산출, 하네스 `work` 입력) |
 | 코드 구현 진행/검증 상태 | 하네스 `.harness/runs/run-{id}.md` (`work` 소유, gitignore — 어시스턴트가 직접 다루지 않음) |
-| 코드 과제 시작 기준점 | `task.json.codeBaseSha` (review-code/finish-work의 range 수집 기준) |
+| 코드 과제 시작 기준점 | `task.json.codeBaseSha` (review-code/finish-task의 range 수집 기준) |
 | 산출물 본문 (정책서/흐름도/QA 등) | Notion |
 | 워크스페이스 설정 | 로컬 `.assistant/workspace.json` |
 | 어시스턴트 마찰(불편) 기록 | 로컬 `.assistant/improvement-log.jsonl` (gitignore, append-only. `/yeoboya-insights`가 소비) |
@@ -48,7 +48,7 @@
 - **버그 분석 선행 경고(소프트)**: bugfix에서 `write-qa`(QA 시나리오) 선택 시 `task.json.links`에 `analyze-bug`(버그 분석)이 없으면 경고 후 진행 가능(차단 아님). 하드 게이트가 아니다.
 - **write-code = 하네스 work 위임 래퍼**: write-code는 더 이상 phase를 직접 실행하지 않는다. 선행 Notion 산출물+하네스 문서로 `.assistant/<과제번호>/plan.md`를 만들고 `task.json.codeBaseSha`를 기록한 뒤, 하네스 플러그인의 `work` 닫힌 루프(plan-reviewer→TDD→검증→bug-fix→harness-check→harness-update)에 구현을 위임한다. 하네스 부트스트랩 미확인(`harness.bootstrapped ≠ true`) 시 write-code는 하네스 work을 호출하지 않고 setup 재실행을 안내한다. **work이 모든 완료기준 통과를 보고하면 write-code가 `task.json.codeWriteDone=true`를 기록한다**(중단 시 미기록). bugfix의 `fix-bug`도 수정 완료 시 동일하게 기록한다 — 코드 세부작업은 Notion 산출물이 없어 `links`에 키가 안 생기므로 이 플래그가 완료 표시·게이트의 유일 근거다.
 - **review-code 하드 선행조건**: `task.json.codeWriteDone === true`일 때만 실행 가능(choose-subtask 진입 게이트, taskType 무관). 코드 작성/수정이 끝나기 전 리뷰 진입을 막는다.
-- **finish-work 하드 선행조건**: `task.json.codeReviewDone === true`일 때만 실행 가능. choose-subtask와 finish-work 양쪽에서 확인. 플래그 기반 하드 선행조건은 `codeWriteDone`→review-code, `codeReviewDone`→finish-work 둘뿐이다. (write-code는 feature에 한해 필수 문서 게이트라는 별도 하드 블록이 있다 — 위 write-code 진입 게이트 불릿 참조.) 그 외 세부작업에는 선행조건 없음.
+- **finish-task 하드 선행조건**: `task.json.codeReviewDone === true`일 때만 실행 가능. choose-subtask와 finish-task 양쪽에서 확인. 플래그 기반 하드 선행조건은 `codeWriteDone`→review-code, `codeReviewDone`→finish-task 둘뿐이다. (write-code는 feature에 한해 필수 문서 게이트라는 별도 하드 블록이 있다 — 위 write-code 진입 게이트 불릿 참조.) 그 외 세부작업에는 선행조건 없음.
 - **edit-work = 변경 전파 오케스트레이터**(독립 진입점, 세부작업 아님): 과제 진행 중 정책·흐름·명세가 바뀌면 activeTask에 대해 변경 델타를 받아 ① 영향 범위(정책서~QA)를 판단해 사용자 확정 → ② 영향 문서를 의존 순서로 기존 문서 스킬(write-policy/write-domain/draw-ui-flow/draw-data-flow/write-qa)에 재trigger해 갱신(trigger 시 "기존 페이지 seed로 델타만 반영"을 taskType 무관하게 지시) → ③ 코드가 영향받고 착수됨(plan.md 존재)이면 plan.md를 수정 델타로 재프레이밍하고 `codeWriteDone`/`codeReviewDone=false` 리셋(`codeBaseSha` 유지) 후 write-code 경유로 재작성 위임. 확정 직후 마찰 로그에 `spec-change` 1건을 남겨 insights가 스펙 변경 빈도를 추적한다. 설계: `docs/superpowers/specs/2026-07-02-edit-work-change-propagation-design.md`.
 
 ## 스킬 self-validation 원칙

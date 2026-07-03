@@ -40,8 +40,8 @@ write-policy-feedback은 **버전드 키**다(`constants.json` `VERSIONED_TITLE_
 | 담당자 | relation (multi) | `create-work` | 본인 worker URL만 append (replace 금지) |
 | 과제 상태 | select | — | 스킬 범위 외 (Notion에서 수동 설정) |
 | 과제 일정 | date range | — | 스킬 범위 외 (Notion에서 수동 설정) |
-| iOS 완료 | checkbox | `finish-work` | `workspace.platform=="iOS"`면 true |
-| Android 완료 | checkbox | `finish-work` | `workspace.platform=="Android"`면 true |
+| iOS 완료 | checkbox | `finish-task` | `workspace.platform=="iOS"`면 true |
+| Android 완료 | checkbox | `finish-task` | `workspace.platform=="Android"`면 true |
 
 각 속성은 해당 기점 스킬만 변경 권한을 가진다. 그 외 스킬은 read-only.
 
