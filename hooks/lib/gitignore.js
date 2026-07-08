@@ -3,14 +3,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-// `.assistant/` 아래 로컬 전용(커밋 금지) 파일들. `.assistant/` 전체가 아니라
-// 파일별로 무시한다 — task.json/workspace.json 등은 커밋 대상이기 때문.
+// `.assistant/` 전체를 무시한다 — task.json(Notion 캐시)/plan.md(write-code 재생성)/
+// workspace.json 모두 로컬 전용이며 각 개발자가 로컬에서 재구성한다.
 const HEADER = '# solution-assistant (local-only)';
 const GITIGNORE_ENTRIES = [
-  '.assistant/improvement-log.jsonl',
-  '.assistant/.friction-session/',
-  '.assistant/insights.html',
-  '.assistant/.insights-narrative.html',
+  '.assistant/',
 ];
 
 // 대상 repo의 .gitignore에 누락된 엔트리만 idempotent하게 덧붙인다.

@@ -24,7 +24,9 @@
 | 코드 과제 시작 기준점 | `task.json.codeBaseSha` (review-code/finish-task의 range 수집 기준) |
 | 산출물 본문 (정책서/흐름도/QA 등) | Notion |
 | 워크스페이스 설정 | 로컬 `.assistant/workspace.json` |
-| 어시스턴트 마찰(불편) 기록 | 로컬 `.assistant/improvement-log.jsonl` (gitignore, append-only. `/solution-insights`가 소비) |
+| 어시스턴트 마찰(불편) 기록 | 로컬 `.assistant/improvement-log.jsonl` (append-only. `/solution-insights`가 소비) |
+
+`.assistant/` **폴더 전체가 gitignore**된다(setup §3.1이 대상 repo `.gitignore`에 `.assistant/` 1줄 보장 — 단일 출처 `hooks/lib/gitignore.js`). task.json은 Notion 캐시, plan.md는 write-code 재생성, workspace.json은 로컬 설정이라 커밋하지 않고 각 개발자가 로컬에서 재구성한다. 따라서 `codeBaseSha` 등 상태는 로컬 전용이다.
 
 연결 규칙: `task.json.links[<key>]`로 세부작업과 Notion 산출물을 연결한다. 다중 페이지 세부작업(draw-data-flow)은 `links[<key>][<페이지 제목>]`. 버전드 세부작업(write-policy-feedback)도 같은 다중 구조로, 기획서 버전마다 `"기획서 검토 - <버전>"` 새 페이지를 만들어 `links[<key>][<전체 제목>]`에 누적한다(단일 페이지 update 아님 — `VERSIONED_TITLE_PREFIXES`, state-schema §4 / notion-schema §1).
 

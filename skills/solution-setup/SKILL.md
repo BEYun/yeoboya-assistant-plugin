@@ -115,14 +115,14 @@ prerequisite 통과 후 사용자에게 묻는 것은 아래 4개이고, Notion 
 
 ### 3.1 `.assistant/` gitignore 보장
 
-workspace.json을 쓴 뒤(이 시점에 대상 repo에 `.assistant/`가 생긴다) 로컬 전용 파일들이 대상 repo의 `.gitignore`에 등록됐는지 보장한다. `.assistant/` 전체가 아니라 파일별 무시다 — task.json/workspace.json은 커밋 대상이기 때문.
+workspace.json을 쓴 뒤(이 시점에 대상 repo에 `.assistant/`가 생긴다) `.assistant/` 폴더 전체가 대상 repo의 `.gitignore`에 등록됐는지 보장한다. `.assistant/`는 전부 로컬 전용이다 — task.json은 Notion 캐시, plan.md는 write-code 재생성, workspace.json은 로컬 설정으로 각 개발자가 로컬에서 재구성한다.
 
 ```bash
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 node ${CLAUDE_PLUGIN_ROOT}/hooks/ensure-gitignore.js "$ROOT"
 ```
 
-이 CLI는 누락된 엔트리(`improvement-log.jsonl` / `.friction-session/` / `insights.html` / `.insights-narrative.html`)만 idempotent하게 덧붙인다(이미 있으면 무변경). 엔트리 목록의 단일 출처는 `hooks/lib/gitignore.js`의 `GITIGNORE_ENTRIES`. git repo가 아니어도(현재 디렉터리 fallback) 안전하게 동작한다.
+이 CLI는 누락된 엔트리(`.assistant/`)만 idempotent하게 덧붙인다(이미 있으면 무변경). 엔트리 목록의 단일 출처는 `hooks/lib/gitignore.js`의 `GITIGNORE_ENTRIES`. git repo가 아니어도(현재 디렉터리 fallback) 안전하게 동작한다.
 
 ## 4. 종료 안내
 
