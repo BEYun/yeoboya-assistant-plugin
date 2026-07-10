@@ -3,13 +3,13 @@
   "owner": { "name": "solution" },
   "metadata": {
     "description": "솔루션개발부 어시스턴트 플러그인 카탈로그",
-    "version": "2.2.0"
+    "version": "2.3.0"
   },
   "plugins": [
     {
       "name": "solution-assistant",
       "source": "./",
-      "description": "솔루션개발부 업무 보조 플러그인 — 5개 서비스(달라, 클럽라이브, 여보야, 클럽5678, AI식단)의 iOS/Android 개발 어시스턴트. Hybrid 제어 모델, /superpowers + /figma 레퍼런스."
+      "description": "솔루션개발부 업무 보조 플러그인 — 5개 서비스(달라, 클럽라이브, 여보야, 클럽5678, 하루온)의 iOS/Android 개발 어시스턴트. Hybrid 제어 모델, /superpowers + /figma 레퍼런스."
     },
     {
       "name": "solution-harness",

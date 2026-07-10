@@ -1,6 +1,6 @@
 # solution-assistant
 
-> **솔루션개발부 업무 보조 플러그인** — 5개 서비스(달라 · 클럽라이브 · 여보야 · 클럽5678 · AI식단) × iOS/Android × feature/update/bugfix.
+> **솔루션개발부 업무 보조 플러그인** — 5개 서비스(달라 · 클럽라이브 · 여보야 · 클럽5678 · 하루온) × iOS/Android × feature/update/bugfix.
 >
 > 과제 하나의 전 과정(기획서 검토 → 코드 → 리뷰 → QA → 종결)을 세부작업 단위로 안내하고, 산출물을 Notion에 축적한다.
 

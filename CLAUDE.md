@@ -1,6 +1,6 @@
 # solution-assistant plugin
 
-5개 서비스(달라, 클럽라이브, 여보야, 클럽5678, AI식단) × 2 플랫폼(iOS, Android) × 3 taskType(feature, update, bugfix) 개발 어시스턴트.
+5개 서비스(달라, 클럽라이브, 여보야, 클럽5678, 하루온) × 2 플랫폼(iOS, Android) × 3 taskType(feature, update, bugfix) 개발 어시스턴트.
 
 ## 필수 설치사항
 
