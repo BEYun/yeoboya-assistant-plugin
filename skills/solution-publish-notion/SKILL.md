@@ -106,7 +106,7 @@ solution-publish-notion 호출 파라미터:
     title?: "<draw-data-flow 호출 시만 필수. 다른 key는 생략>"
     markdown: "<페이지 본문>"
     properties?:
-      taskType?: <feature|update|bugfix>   # WORKTYPE_LABEL로 select 값 변환
+      taskType?: <feature|update|bugfix>   # 작업 유형 select 값은 subtasks.js worktype <taskType>로 변환(정본 constants.json)
       작업명?: string
       도메인?: string                      # 존재하는 select option만
       담당자?: { mode: "append", urls: string[] }   # 항상 append, replace 금지

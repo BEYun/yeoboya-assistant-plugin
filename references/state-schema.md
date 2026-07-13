@@ -98,52 +98,15 @@ Notion MCP is a required prerequisite; there is no `notion.mode` field.
 ## 4. Shared constants
 
 ```
-SUBTASK_LIST = [
-  "write-policy-feedback", "write-policy", "write-domain",
-  "draw-ui-flow", "draw-data-flow", "write-qa",
-  "analyze-bug", "write-code", "fix-bug", "review-code",
-  "fix-qa-bug", "finish-task"
-]   # 전체 12개 키 등록부 (가시성·라벨 무관). 키 정본 — 표시 순서는 taskType별 SUBTASK_GROUPS가 결정.
-
-# taskType → { 그룹: [키…] }. 그룹/키 순서가 곧 choose-subtask 표시 순서.
-SUBTASK_GROUPS = {
-  feature: {
-    "기획":    ["write-policy-feedback", "write-policy"],
-    "설계":    ["write-domain", "draw-ui-flow", "draw-data-flow", "write-qa"],
-    "개발":    ["write-code", "review-code"],
-    "QA 대응": ["fix-qa-bug"],
-    "종결":    ["finish-task"]
-  },
-  update: {   # 구성은 feature와 동일, 라벨만 '수정'
-    "기획":    ["write-policy-feedback", "write-policy"],
-    "설계":    ["write-domain", "draw-ui-flow", "draw-data-flow", "write-qa"],
-    "개발":    ["write-code", "review-code"],
-    "QA 대응": ["fix-qa-bug"],
-    "종결":    ["finish-task"]
-  },
-  bugfix: {
-    "진단":    ["analyze-bug", "write-qa"],
-    "개발":    ["fix-bug", "review-code"],
-    "QA 대응": ["fix-qa-bug"],
-    "종결":    ["finish-task"]
-  }
-}
-
-# 키 → { taskType: 라벨 }. 해당 taskType의 SUBTASK_GROUPS에 없으면 그 키 생략.
-SUBTASK_LABELS = {
-  "write-policy-feedback": { feature: "기획서 검토",  update: "기획서 검토" },
-  "write-policy":          { feature: "정책서 작성",  update: "정책서 수정" },
-  "write-domain":          { feature: "도메인 명세서", update: "도메인 명세서 수정" },
-  "draw-ui-flow":          { feature: "UI 흐름도",    update: "UI 흐름도 수정" },
-  "draw-data-flow":        { feature: "데이터 흐름도", update: "데이터 흐름도 수정" },
-  "write-qa":              { feature: "QA 시나리오",  update: "QA 시나리오",  bugfix: "QA 시나리오" },
-  "analyze-bug":           { bugfix:  "버그 분석" },
-  "write-code":            { feature: "코드 작성",    update: "코드 수정" },
-  "fix-bug":               { bugfix:  "버그 수정" },
-  "review-code":           { feature: "코드 리뷰",    update: "코드 리뷰",   bugfix: "코드 리뷰" },
-  "fix-qa-bug":            { feature: "QA 버그 수정", update: "QA 버그 수정", bugfix: "QA 버그 수정" },
-  "finish-task":           { feature: "작업 종결",    update: "작업 종결",   bugfix: "작업 종결" }
-}
+# SUBTASK_LIST / SUBTASK_GROUPS / SUBTASK_LABELS
+# 런타임 정의: hooks/lib/constants.json (단일 SOT). 변경 시 해당 파일만 수정한다.
+# - SUBTASK_LIST: 전체 12개 키 등록부(가시성·라벨 무관). 키 정본 — 표시 순서는 taskType별 SUBTASK_GROUPS.
+# - SUBTASK_GROUPS: taskType → { 그룹: [키…] }. 그룹/키 순서가 곧 choose-subtask 표시 순서.
+#   feature/update = 5그룹·10키(구성 동일, 라벨만 작성↔수정), bugfix = 4그룹·6키(설계 없음, '진단' 그룹).
+# - SUBTASK_LABELS: 키 → { taskType: 라벨 }. 해당 taskType의 SUBTASK_GROUPS에 없으면 그 키 생략.
+# 스킬은 이 데이터를 md로 읽지 않는다 — `hooks/lib/subtasks.js menu <taskType>`(run-node.sh 경유)로
+#   그룹·번호(n)·키·라벨·순서(order=노출키 집합)를 받는다. choose-subtask 메뉴 렌더·선택 검증·누락
+#   문서 라벨 변환, edit-task 의존 사슬 정렬이 이 출력을 소비한다.
 
 # TITLE_TO_KEY / KEY_TO_TITLE
 # 런타임 정의: hooks/lib/constants.json (단일 SOT). analyze-bug↔"버그 분석" 포함.
@@ -178,7 +141,9 @@ SUBTASK_LABELS = {
 # suffix로 매칭한다(notion.js: isNotionWriteTool/notionToolKind = ^mcp__.+__<suffix>$).
 # hooks.json matcher 정규식·스킬 본문·CLAUDE.md는 require 불가라 이 값을 미러링한다(정본은 여기).
 
-WORKTYPE_LABEL = { feature: "신규 개발", update: "변경/고도화", bugfix: "버그 수정" }
+# WORKTYPE_LABEL = { feature: "신규 개발", update: "변경/고도화", bugfix: "버그 수정" }
+# 런타임 정의: hooks/lib/constants.json (단일 SOT). Notion '작업 유형' select 값.
+# publish-notion이 `hooks/lib/subtasks.js worktype <taskType>`(run-node.sh 경유)로 받아 변환한다.
 
 # write-code는 phase 상수를 두지 않는다. 코드 작업는 하네스 `work` 닫힌 루프에 위임된다.
 # write-code는 feature/update 뷰에만 노출된다(bugfix는 fix-bug로 코드 변경).

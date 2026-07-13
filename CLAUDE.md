@@ -59,16 +59,16 @@
 
 ## 상태/스키마/상수 단일 출처
 
-상태 파일 스키마, 모든 세부작업 키와 라벨 매핑(`SUBTASK_LIST` 12키 등록부 / `SUBTASK_GROUPS`=taskType별 그룹 구성 / `SUBTASK_LABELS`=키×taskType 라벨) — 전부 `references/state-schema.md`에 있다. TITLE_TO_KEY/KEY_TO_TITLE 런타임 정의는 `hooks/lib/constants.json` 참조. 스킬 본문에 중복 정의 금지.
+**상수 데이터**(`SUBTASK_LIST` 12키 등록부 / `SUBTASK_GROUPS` taskType별 그룹 구성 / `SUBTASK_LABELS` 키×taskType 라벨 / `WORKTYPE_LABEL` / `TITLE_TO_KEY` 등)의 **런타임 정본은 `hooks/lib/constants.json` 하나**다. 스킬(LLM)은 이 데이터를 파일로 열지 않는다 — `hooks/lib/subtasks.js`(`menu <taskType>`·`worktype <taskType>`, `run-node.sh` 경유)로 결정적으로 받는다. 이렇게 해야 스킬이 plugin 파일을 손으로 쓴 상대경로로 열다 오해석되는 버그(스킬 폴더 기준 해석 → 파일 없음)가 원천 차단된다. `references/state-schema.md`는 상태 파일 **스키마(§1–§3)·규칙(§6)**을 문서화하고 상수는 constants.json을 **참조만** 한다(리터럴 데이터 없음). 스킬 본문·md에 상수 중복 정의 금지.
 
 ## 개발/테스트
 
 hooks/lib 의 결정적 node 로직(sync-links, notion, work, swagger-extract, hook-runtime 등)은 `hooks/tests/`에 테스트가 있다. 추가로 `templates.test.js`가 4개 산출물 템플릿(정책서·도메인·UI 흐름도·데이터 흐름도의 `references/*-template.md`) 구조를 검증한다 — 각 템플릿에 `이전 버전:` provenance 라인 + `## 변경 이력` 제목(§ 번호 없이) + `참고본` 열이 있어야 한다. package.json 없음 — node 내장 러너로 직접 실행한다:
 
 ```bash
-node --test hooks/tests/*.test.js   # 전체 (115 tests). 디렉터리형 `node --test hooks/tests/`는 파일을 못 잡아 실패하니 glob 필수
+node --test hooks/tests/*.test.js   # 전체 (125 tests). 디렉터리형 `node --test hooks/tests/`는 파일을 못 잡아 실패하니 glob 필수
 ```
 
 **node 실행 규약**: hook과 스킬의 모든 node 호출은 `hooks/run-node.sh`(POSIX sh) 래퍼를 경유한다 — Claude Code가 GUI 앱으로 실행돼 PATH에 node가 없어도 homebrew/nvm/fnm/volta/asdf에서 node를 탐색해 실행하기 위함이다(GUI PATH에서 `#!/usr/bin/env node`는 `env: node: No such file or directory`, 맨 `node`는 Exit 127로 깨진다). hook 파일을 shebang으로 직접 실행하거나 스킬 안내에서 맨 `node <script>`를 쓰지 말고 `sh ${CLAUDE_PLUGIN_ROOT}/hooks/run-node.sh <script>` 형태로 감싼다. `friction-wiring.test.js`가 hooks.json의 wrapper 경유를, `run-node.test.js`가 탐색 로직을 강제한다.
 
-스킬 SKILL.md·agent 본문(산문)은 테스트 대상이 아니지만, 위 4개 산출물 템플릿은 `templates.test.js`가 구조를 강제한다 — 템플릿의 후행 메타 섹션(정책서 미정 항목·변경 이력)에 § 번호를 붙이거나 `참고본` 열을 빼면 테스트가 실패한다. 상수·라벨·스키마 변경 시 `references/state-schema.md`(SOT)와 `hooks/lib/constants.json`을 함께 갱신하고 위 테스트를 돌린다.
+스킬 SKILL.md·agent 본문(산문)은 테스트 대상이 아니지만, 위 4개 산출물 템플릿은 `templates.test.js`가 구조를 강제한다 — 템플릿의 후행 메타 섹션(정책서 미정 항목·변경 이력)에 § 번호를 붙이거나 `참고본` 열을 빼면 테스트가 실패한다. **상수·라벨 변경**은 `hooks/lib/constants.json`(정본) 한 곳만 고치고 `subtasks.test.js`/`constants.test.js`를 돌린다(state-schema.md §4는 참조 주석이라 데이터 동기화 불필요). **파일 스키마·규칙 변경**은 `references/state-schema.md`를 고친다.

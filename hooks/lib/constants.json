@@ -39,5 +39,52 @@
   "DESIGN_TOOLS": {
     "figma":  { "label": "Figma",  "detectToolSuffixes": ["get_design_context", "get_variable_defs"] },
     "zeplin": { "label": "Zeplin", "detectToolSuffixes": [] }
+  },
+  "SUBTASK_LIST": [
+    "write-policy-feedback", "write-policy", "write-domain",
+    "draw-ui-flow", "draw-data-flow", "write-qa",
+    "analyze-bug", "write-code", "fix-bug", "review-code",
+    "fix-qa-bug", "finish-task"
+  ],
+  "SUBTASK_GROUPS": {
+    "feature": {
+      "기획":    ["write-policy-feedback", "write-policy"],
+      "설계":    ["write-domain", "draw-ui-flow", "draw-data-flow", "write-qa"],
+      "개발":    ["write-code", "review-code"],
+      "QA 대응": ["fix-qa-bug"],
+      "종결":    ["finish-task"]
+    },
+    "update": {
+      "기획":    ["write-policy-feedback", "write-policy"],
+      "설계":    ["write-domain", "draw-ui-flow", "draw-data-flow", "write-qa"],
+      "개발":    ["write-code", "review-code"],
+      "QA 대응": ["fix-qa-bug"],
+      "종결":    ["finish-task"]
+    },
+    "bugfix": {
+      "진단":    ["analyze-bug", "write-qa"],
+      "개발":    ["fix-bug", "review-code"],
+      "QA 대응": ["fix-qa-bug"],
+      "종결":    ["finish-task"]
+    }
+  },
+  "SUBTASK_LABELS": {
+    "write-policy-feedback": { "feature": "기획서 검토",   "update": "기획서 검토" },
+    "write-policy":          { "feature": "정책서 작성",   "update": "정책서 수정" },
+    "write-domain":          { "feature": "도메인 명세서", "update": "도메인 명세서 수정" },
+    "draw-ui-flow":          { "feature": "UI 흐름도",     "update": "UI 흐름도 수정" },
+    "draw-data-flow":        { "feature": "데이터 흐름도", "update": "데이터 흐름도 수정" },
+    "write-qa":              { "feature": "QA 시나리오",   "update": "QA 시나리오",   "bugfix": "QA 시나리오" },
+    "analyze-bug":           { "bugfix":  "버그 분석" },
+    "write-code":            { "feature": "코드 작성",     "update": "코드 수정" },
+    "fix-bug":               { "bugfix":  "버그 수정" },
+    "review-code":           { "feature": "코드 리뷰",     "update": "코드 리뷰",     "bugfix": "코드 리뷰" },
+    "fix-qa-bug":            { "feature": "QA 버그 수정",  "update": "QA 버그 수정",  "bugfix": "QA 버그 수정" },
+    "finish-task":           { "feature": "작업 종결",     "update": "작업 종결",     "bugfix": "작업 종결" }
+  },
+  "WORKTYPE_LABEL": {
+    "feature": "신규 개발",
+    "update": "변경/고도화",
+    "bugfix": "버그 수정"
   }
 }
