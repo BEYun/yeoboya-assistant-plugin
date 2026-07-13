@@ -3,7 +3,7 @@
   "owner": { "name": "solution" },
   "metadata": {
     "description": "솔루션개발부 어시스턴트 플러그인 카탈로그",
-    "version": "2.3.0"
+    "version": "2.4.0"
   },
   "plugins": [
     {

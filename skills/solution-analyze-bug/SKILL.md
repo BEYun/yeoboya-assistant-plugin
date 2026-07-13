@@ -1,6 +1,6 @@
 ---
 name: solution-analyze-bug
-description: "solution-choose-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. bugfix 과제에서 상류 기획/설계 산출물이 없으므로 사용자에게 버그 내용(증상·재현 절차·기대 동작)을 직접 묻고, 원인을 분석하며, 성공 기준(acceptance criteria)을 정의한 markdown을 작성한 뒤 자체 검증을 거쳐 title='버그 분석'으로 solution-publish-notion을 호출한다. notion-page-record hook이 pageId를 task.json.links['analyze-bug']에 자동 기록한다."
+description: "solution-choose-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. bugfix 작업에서 상류 기획/설계 산출물이 없으므로 사용자에게 버그 내용(증상·재현 절차·기대 동작)을 직접 묻고, 원인을 분석하며, 성공 기준(acceptance criteria)을 정의한 markdown을 작성한 뒤 자체 검증을 거쳐 title='버그 분석'으로 solution-publish-notion을 호출한다. notion-page-record hook이 pageId를 task.json.links['analyze-bug']에 자동 기록한다."
 user-invocable: false
 ---
 
@@ -11,7 +11,7 @@ user-invocable: false
 ## 1. 전제
 
 - task.json 존재. taskType=bugfix 가정 (choose-subtask이 bugfix 뷰의 `진단` 그룹에서만 노출).
-- **진입 시 sync (필수 첫 동작)**: `solution-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다 — 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
+- **진입 시 sync (필수 첫 동작)**: `solution-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식 페이지를 `task.json.links`에 동기화한다 — 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
 
 ## 2. 입력 수집 (사용자에게 직접 질의)
 
@@ -64,11 +64,11 @@ user-invocable: false
 
 ```
 solution-publish-notion 호출:
-  work: <과제번호>
+  work: <작업번호>
   mode: "dispatch"
   key: "analyze-bug"
   markdown: <위에서 작성한 마크다운>
-  properties: { taskType: "bugfix", 과제명: <name> }
+  properties: { taskType: "bugfix", 작업명: <name> }
 ```
 
 title은 전달하지 않는다 — publish-notion이 `KEY_TO_TITLE["analyze-bug"][0]` = "버그 분석"을 페이지 제목으로 사용. publish 후 notion-page-record hook이 task.json.links['analyze-bug']에 pageId를 자동 기록.

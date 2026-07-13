@@ -11,7 +11,7 @@ user-invocable: false
 ## 1. 전제
 
 - task.json 존재 (choose-subtask이 trigger)
-- **진입 시 sync (필수 첫 동작)**: `solution-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
+- **진입 시 sync (필수 첫 동작)**: `solution-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
 
 ## 2. 입력 fetch
 
@@ -55,12 +55,12 @@ user-invocable: false
 
 ```
 solution-publish-notion 호출:
-  work: <과제번호>
+  work: <작업번호>
   mode: "dispatch"
   key: "write-policy-feedback"
   title: "기획서 검토 - <버전>"        # 버전드 키 — 전체 제목 필수 전달 (예: "기획서 검토 - v0.7")
   markdown: <위에서 작성한 마크다운>
-  properties: { taskType: <taskType>, 과제명: <name>, 도메인: <도메인 or 생략> }
+  properties: { taskType: <taskType>, 작업명: <name>, 도메인: <도메인 or 생략> }
 ```
 
 write-policy-feedback은 **버전드 키**다(`VERSIONED_TITLE_PREFIXES`). 매 버전마다 새 페이지가 생성되고(같은 버전 재게시만 update), 모두 row 본문의 단일 제목2 `"기획서 검토 결과"` 아래에 누적된다. publish 후 notion-page-record hook이 `task.json.links['write-policy-feedback'][<전체 제목>]`에 pageId를 자동 기록한다(버전별 누적).

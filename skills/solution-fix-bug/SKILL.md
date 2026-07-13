@@ -26,7 +26,7 @@ user-invocable: false
 
 ## 3. 커밋 메시지
 
-표준 패턴: `[<과제번호>] fix: <증상 요약>` (예: `[DCL-1245] fix: 클럽 입장 시 알림 중복 발송`)
+표준 패턴: `[<작업번호>] fix: <증상 요약>` (예: `[DCL-1245] fix: 클럽 입장 시 알림 중복 발송`)
 
 본문에 근본 원인 + 수정 접근 요약.
 
@@ -41,7 +41,7 @@ user-invocable: false
 
 버그 수정+테스트가 끝나면 (커밋 직후):
 
-`.assistant/<과제번호>/task.json`을 Read → `codeWriteDone` 필드를 `true`로 설정 → Write.
+`.assistant/<작업번호>/task.json`을 Read → `codeWriteDone` 필드를 `true`로 설정 → Write.
 
 이 플래그가 `review-code` 진입 하드 선행조건이자 choose-subtask 완료 마커(✓)의 근거다(state-schema §1). bugfix에는 Notion 산출물이 없는 코드 세부작업이므로 `links`에 키가 생기지 않아 이 플래그가 완료를 나타내는 유일한 수단이다.
 

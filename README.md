@@ -2,13 +2,13 @@
 
 > **솔루션개발부 업무 보조 플러그인** — 5개 서비스(달라 · 클럽라이브 · 여보야 · 클럽5678 · 하루온) × iOS/Android × feature/update/bugfix.
 >
-> 과제 하나의 전 과정(기획서 검토 → 코드 → 리뷰 → QA → 종결)을 세부작업 단위로 안내하고, 산출물을 Notion에 축적한다.
+> 작업 하나의 전 과정(기획서 검토 → 코드 → 리뷰 → QA → 종결)을 세부작업 단위로 안내하고, 산출물을 Notion에 축적한다.
 
 ## 설치
 
 **1. 선행조건 (필수)** — 없으면 `/solution-setup`이 차단한다.
 
-- **Notion MCP** (`notion-*`) — 산출물 본문 저장소 + 과제 DB
+- **Notion MCP** (`notion-*`) — 산출물 본문 저장소 + 작업 DB
 - **superpowers 플러그인** — brainstorming · writing-plans 등 프로세스 스킬
 - **하네스 플러그인** (`solution-harness`) — write-code가 코드 구현을 위임하는 `work` 엔진
 
@@ -34,15 +34,15 @@
 
 ## 용어
 
-- **task (과제)** — 개발 단위 하나(예: `DCL-1234`). `.assistant/<과제번호>/task.json`이 메타데이터를 캐시하고, 권위 출처는 Notion 과제 row. 병렬 과제 허용.
-- **subtask (세부작업)** — 과제를 진행하는 개별 작업. 진행 상태·선행조건·순서 개념 없이 자유 선택된다(일부 하드 게이트 제외). 완료 판정은 `task.json.links`의 키 존재 여부로만. 목록은 작업 유형별로 다르다.
+- **task (작업)** — 개발 단위 하나(예: `DCL-1234`). `.assistant/<작업번호>/task.json`이 메타데이터를 캐시하고, 권위 출처는 Notion 작업 row. 병렬 작업 허용.
+- **subtask (세부작업)** — 작업를 진행하는 개별 작업. 진행 상태·선행조건·순서 개념 없이 자유 선택된다(일부 하드 게이트 제외). 완료 판정은 `task.json.links`의 키 존재 여부로만. 목록은 작업 유형별로 다르다.
 
 ## 프로젝트 초기설정
 
 `/solution-setup`으로 워크스페이스를 초기화한다 — **다른 스킬을 쓰기 전 반드시 먼저 실행**.
 
 - **검증** — 3대 선행조건(Notion MCP · superpowers · 하네스)
-- **수집** — 서비스 · 플랫폼(iOS/Android) · 작업자 · Notion 과제 DB → `.assistant/workspace.json`에 기록
+- **수집** — 서비스 · 플랫폼(iOS/Android) · 작업자 · Notion 작업 DB → `.assistant/workspace.json`에 기록
 - **확인** — 현재 repo의 하네스 부트스트랩(루트 문서 존재)
 
 ```mermaid
@@ -68,7 +68,7 @@ flowchart TD
         i3 --> i4["④ 디자인 툴"]
     end
 
-    IN --> NF["Notion 자동 fetch<br/>과제 DB data-source · 작업자 페이지"]
+    IN --> NF["Notion 자동 fetch<br/>작업 DB data-source · 작업자 페이지"]
 
     NF --> W[".assistant/workspace.json 작성"]
 
@@ -88,22 +88,22 @@ flowchart TD
 
 ## 기능
 
-직접 호출 가능한 진입점은 5개다. 세부작업(과제 종결 등)은 `/solution-choose-subtask`이 trigger한다.
+직접 호출 가능한 진입점은 5개다. 세부작업(작업 종결 등)은 `/solution-choose-subtask`이 trigger한다.
 
 | 기능 | 호출 |
 |---|---|
 | 프로젝트 설정 | `/solution-setup` |
-| 작업 생성 | `/solution-create-task <과제번호>` |
+| 작업 생성 | `/solution-create-task <작업번호>` |
 | 작업 진행 (세부작업 선택·trigger) | `/solution-choose-subtask` |
 | 진행 중 변경 전파 | `/solution-edit-task` |
 | 마찰 로그 분석 (보조) | `/solution-insights` |
 
-> **작업 완료**는 `/solution-choose-subtask` → **과제 종결** 세부작업으로 진행한다.
+> **작업 완료**는 `/solution-choose-subtask` → **작업 종결** 세부작업으로 진행한다.
 
 **진입 하드 게이트** (choose-subtask이 trigger 직전 검사):
 
 - feature `코드 작성` — 정책서 · UI 흐름도 · 데이터 흐름도가 모두 있어야 진입
-- `코드 리뷰` — `codeWriteDone` 필요 · `과제 종결` — `codeReviewDone` 필요
+- `코드 리뷰` — `codeWriteDone` 필요 · `작업 종결` — `codeReviewDone` 필요
 
 ## 전체 흐름
 
@@ -159,7 +159,7 @@ flowchart TD
 
 ## 세부작업 지도
 
-과제 유형별 세부작업 전체와 산출물. 완료 판정은 문서형은 `task.json.links` 키 존재, 코드형은 플래그(`codeWriteDone`/`codeReviewDone`)로 한다.
+작업 유형별 세부작업 전체와 산출물. 완료 판정은 문서형은 `task.json.links` 키 존재, 코드형은 플래그(`codeWriteDone`/`codeReviewDone`)로 한다.
 
 **feature · update** (라벨: feature → update)
 
@@ -174,7 +174,7 @@ flowchart TD
 | 개발 | 코드 작성 → 코드 수정 | `write-code` | 코드 (하네스 `work` 위임) · Notion 없음 → `codeWriteDone` 🟨 |
 | 개발 | 코드 리뷰 | `review-code` | 리뷰 → `codeReviewDone` 🟨 |
 | QA 대응 | QA 버그 수정 | `fix-qa-bug` | 코드 |
-| 종결 | 과제 종결 | `finish-task` | Notion 작업 DB iOS/Android 완료 토글 🟨 |
+| 종결 | 작업 종결 | `finish-task` | Notion 작업 DB iOS/Android 완료 토글 🟨 |
 
 **bugfix** (기획·설계 없음)
 
@@ -185,6 +185,6 @@ flowchart TD
 | 개발 | 버그 수정 | `fix-bug` | 코드 → `codeWriteDone` 🟨 |
 | 개발 | 코드 리뷰 | `review-code` | 리뷰 → `codeReviewDone` 🟨 |
 | QA 대응 | QA 버그 수정 | `fix-qa-bug` | 코드 |
-| 종결 | 과제 종결 | `finish-task` | Notion 작업 DB iOS/Android 완료 토글 🟨 |
+| 종결 | 작업 종결 | `finish-task` | Notion 작업 DB iOS/Android 완료 토글 🟨 |
 
-> 🟨 = 하드 게이트 근거 플래그. 문서 스킬은 진입 시 `sync-links`로 `task.json.links`를 Notion 과제 row 자식 페이지와 동기화한다. 스키마·상수 정본: [`references/state-schema.md`](references/state-schema.md), [`hooks/lib/constants.json`](hooks/lib/constants.json).
+> 🟨 = 하드 게이트 근거 플래그. 문서 스킬은 진입 시 `sync-links`로 `task.json.links`를 Notion 작업 row 자식 페이지와 동기화한다. 스키마·상수 정본: [`references/state-schema.md`](references/state-schema.md), [`hooks/lib/constants.json`](hooks/lib/constants.json).

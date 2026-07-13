@@ -1,12 +1,12 @@
 ---
 name: solution-review-code
-description: "solution-choose-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. `git log --grep='[<과제번호>]'`로 과제 관련 diff를 수집하고, code-reviewer 서브에이전트를 디스패치해 발견사항을 도출하며, 발견사항마다 사용자가 수정-또는-통과를 결정하게 한다. 출력: 리뷰 markdown + (선택) Notion 페이지. Notion 게시는 선택사항이다."
+description: "solution-choose-subtask이 이 세부작업을 trigger할 때만 사용한다. 직접 호출 금지. `git log --grep='[<작업번호>]'`로 작업 관련 diff를 수집하고, code-reviewer 서브에이전트를 디스패치해 발견사항을 도출하며, 발견사항마다 사용자가 수정-또는-통과를 결정하게 한다. 출력: 세션 내 리뷰 markdown. 리뷰 결과는 Notion에 게시하지 않는다(세션 내에서만 다룬다)."
 user-invocable: false
 ---
 
 # solution-review-code
 
-과제번호 관련 diff의 코드 리뷰.
+작업번호 관련 diff의 코드 리뷰.
 
 ## 1. 전제
 
@@ -20,21 +20,21 @@ user-invocable: false
 `task.json.codeBaseSha`를 읽어 **range**로 수집한다(work이 작성한 커밋은 prefix가 빠져도 누락 없이 잡힌다 — 하이브리드 안전망):
 
 ```bash
-BASE=$(jq -r '.codeBaseSha // empty' .assistant/<과제번호>/task.json)
+BASE=$(jq -r '.codeBaseSha // empty' .assistant/<작업번호>/task.json)
 if [ -n "$BASE" ]; then
-  git log  "$BASE"..HEAD --oneline      # 이 과제 시작 이후 전부
+  git log  "$BASE"..HEAD --oneline      # 이 작업 시작 이후 전부
   git diff "$BASE"..HEAD                # 리뷰 대상 diff
 else
   # legacy fallback (codeBaseSha 없음)
-  git log  --grep='\[<과제번호>\]' --oneline
+  git log  --grep='\[<작업번호>\]' --oneline
   git diff <첫 커밋>^..<마지막 커밋>
 fi
 ```
 
-range 안에서 `[<과제번호>]` prefix가 없는 커밋은 **⚠로 표면화**한다(커밋 규약 위반 가시화 — 조용히 버리지 않음). 인터리브된 다른 과제의 커밋이면 사용자에게 이 과제 소속인지 확인받는다:
+range 안에서 `[<작업번호>]` prefix가 없는 커밋은 **⚠로 표면화**한다(커밋 규약 위반 가시화 — 조용히 버리지 않음). 인터리브된 다른 작업의 커밋이면 사용자에게 이 작업 소속인지 확인받는다:
 
 ```bash
-git log "$BASE"..HEAD --oneline | grep -v '\[<과제번호>\]'   # 있으면 ⚠ 보고
+git log "$BASE"..HEAD --oneline | grep -v '\[<작업번호>\]'   # 있으면 ⚠ 보고
 ```
 
 수집된 diff 요약을 사용자에게 노출 (그라운딩).
@@ -56,30 +56,19 @@ git log "$BASE"..HEAD --oneline | grep -v '\[<과제번호>\]'   # 있으면 ⚠
 - **수용** → 리뷰 산출물에 "수용" 표시
 - **반박** → 사용자가 이유 작성, 산출물에 "반박" 표시
 
-## 5. Self-validation (publish 옵션이면)
+## 5. Self-validation
 
 - [ ] 리뷰 산출물에 모든 발견 사항이 표 형태로 정리
 - [ ] 각 발견 사항에 결정 (수정/수용/반박) 라벨
 - [ ] task.json.codeReviewDone이 true로 갱신됐는지 확인
 
-## 6. publish (옵션)
+리뷰 산출물은 **세션 내에서만** 다룬다 — Notion에 게시하지 않는다(코드 리뷰는 산출물 문서 대상이 아니다). 사용자에게 "리뷰 내용을 Notion에 작성할까요?"류의 게시 제안을 하지 않는다.
 
-리뷰 산출물을 Notion으로 발행하려면:
-```
-solution-publish-notion 호출:
-  work: <과제번호>
-  mode: "dispatch"
-  key: "review-code"
-  title: "코드 리뷰 — <과제번호>"
-  markdown: <리뷰 산출물>
-```
-단, review-code는 `TITLE_TO_KEY`에 매핑이 없어 publish해도 hook이 task.json.links에 자동 기록하지 않는다.
-
-## 6.5 codeReviewDone 기록
+## 6. codeReviewDone 기록
 
 리뷰 종료 직전 (publish 여부와 무관하게):
 
-`.assistant/<과제번호>/task.json`을 Read → `codeReviewDone` 필드를 `true`로 설정 → Write.
+`.assistant/<작업번호>/task.json`을 Read → `codeReviewDone` 필드를 `true`로 설정 → Write.
 
 이 단계를 건너뛰면 `finish-task` 진입이 영구 차단된다.
 
@@ -88,6 +77,6 @@ solution-publish-notion 호출:
 리뷰 종료 후:
 
 ```
-코드 리뷰 완료. 다음 권장 단계: 과제 종결.
+코드 리뷰 완료. 다음 권장 단계: 작업 종결.
 새 세션에서 /solution-choose-subtask을 호출하세요.
 ```

@@ -12,15 +12,17 @@ user-invocable: false
 
 - task.json 존재.
 - 기획서 검토 산출물(task.json.links['write-policy-feedback'])이 있으면 입력으로 활용한다. 없으면 사용자에게 알리고 계속 진행할지 확인한다 (강제 종료 없음).
-- **진입 시 sync (필수 첫 동작)**: `solution-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
+- **진입 시 sync (필수 첫 동작)**: `solution-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
 
 ## 2. 입력 fetch
 
-1. Notion에서 과제 DB row 조회 (solution-publish-notion mode=sync) → 과제명/도메인/담당자 등 보조 정보
+1. Notion에서 작업 DB row 조회 (solution-publish-notion mode=sync) → 작업명/도메인/담당자 등 보조 정보
 2. **기획서 검토 페이지 fetch** (`task.json.links['write-policy-feedback']` → notion-fetch)
 3. **taskType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 정책서를 해석한다(자기 재publish, 또는 `referenceTask`의 정책서를 Notion 권위 출처로 해석). **후보 있음(분기 A)** → fetch해 수정의 출발점으로. **후보 없음(분기 B)** → §6대로 사용자에게 기준 모듈/파일 경로를 요청해 코드베이스 기반으로 산출. provenance(이전 버전 출처)는 §6 표대로 메타 블록 + 변경 이력에 기록.
 
 ## 3. 작성 절차
+
+**작성 문체**: 개조식·간결체(구어체·군더더기 배제, 핵심 키워드를 앞에, 한 문장 = 한 정보). 플랫폼은 `workspace.platform`(iOS 또는 Android) 하나로 표기하고 "모바일/네이티브/앱" 등 모호어를 혼용하지 않는다. 용어는 유비쿼터스 언어로 통일한다(§용어 표가 SOT).
 
 1. **검토 결과 흡수** — 기획서 검토 페이지의 Critical/Major/Minor + 권고 항목을 사용자와 함께 정책 결정으로 변환:
    - Critical 권고 → POL 카탈로그의 새 정책 또는 예외/롤백 카테고리
@@ -51,11 +53,11 @@ user-invocable: false
 
 ```
 solution-publish-notion 호출:
-  work: <과제번호>
+  work: <작업번호>
   mode: "dispatch"
   key: "write-policy"
   markdown: <위에서 작성한 마크다운>
-  properties: { taskType: <taskType>, 과제명: <name>, 도메인: <도메인 or 생략> }
+  properties: { taskType: <taskType>, 작업명: <name>, 도메인: <도메인 or 생략> }
 ```
 
 publish 후 notion-page-record hook이 task.json.links['write-policy']에 pageId를 자동 기록.

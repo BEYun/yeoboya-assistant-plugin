@@ -19,13 +19,14 @@ const { hasPendingRecovery, clearRecovery, readFrictionLog } = require('./lib/fr
 
   const recent = readFrictionLog(root).filter((e) => e.source === 'hook').slice(-3);
   const cats = [...new Set(recent.map((e) => e.category))].join(', ') || '마찰';
+  const runner = path.join(__dirname, 'run-node.sh');
   const cli = path.join(__dirname, 'friction-log.js');
 
   const msg = [
     '이번 작업에서 자동 감지된 불편이 있습니다: ' + cats + '.',
     '왜 그랬는지·무엇을 기대했는지 한 줄로 남겨 주세요(정성 기록, 선택).',
     '방법: 아래 JSON을 stdin으로 friction-log CLI에 전달하세요.',
-    "echo '{\"category\":\"<코드키>\",\"skill\":\"<스킬>\",\"severity\":\"friction\",\"what\":\"...\",\"expected\":\"...\",\"source\":\"agent\"}' | node " + cli,
+    "echo '{\"category\":\"<코드키>\",\"skill\":\"<스킬>\",\"severity\":\"friction\",\"what\":\"...\",\"expected\":\"...\",\"source\":\"agent\"}' | sh " + runner + ' ' + cli,
     '남길 게 없으면 그대로 종료해도 됩니다(다시 묻지 않습니다).',
   ].join('\n');
 

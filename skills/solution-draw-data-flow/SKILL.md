@@ -12,7 +12,7 @@ user-invocable: false
 
 - task.json 존재.
 - UI 흐름도(task.json.links['draw-ui-flow'])와 도메인 명세서(task.json.links['write-domain'])가 있으면 참고한다. 없으면 사용자에게 알리고 진행 여부를 확인한다.
-- **진입 시 sync (필수 첫 동작)**: `solution-publish-notion mode="sync-links"`(work=과제번호)를 1회 호출해 과제 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
+- **진입 시 sync (필수 첫 동작)**: `solution-publish-notion mode="sync-links"`(work=작업번호)를 1회 호출해 작업 row 자식 페이지를 `task.json.links`에 동기화한다 — (a) 다른 작업자가 만든 선행 문서를 links에서 인식, (b) 본 산출물이 이미 있으면 publish가 update가 되어 중복 페이지 방지.
 
 ## 2. 입력 fetch
 
@@ -21,6 +21,8 @@ user-invocable: false
 - **taskType=update 이전 버전 해석** — `references/state-schema.md §6` 규칙대로 이전 데이터 흐름도/통신 명세서를 해석한다(자기 재publish, 또는 `referenceTask`의 동종 문서를 Notion 권위 출처로 해석 — 다중 페이지 키이므로 두 제목 모두 매칭). **후보 있음(분기 A)** → 두 페이지 fetch. **후보 없음(분기 B)** → §6대로 기준 모듈/파일 경로를 사용자에게 요청해 코드베이스 기반 산출. provenance는 §6 표대로 헤더 + 변경 이력에 기록.
 
 ## 3. 작성 절차
+
+**작성 문체**: 개조식·간결체(구어체·군더더기 배제, 핵심 키워드를 앞에). 엔터티·이벤트·상태명은 유비쿼터스 언어(도메인 용어)로 — 코드 식별자를 그대로 쓰지 않는다. 플랫폼은 `workspace.platform`(iOS 또는 Android) 하나로 표기, "모바일/네이티브" 등 모호어 금지.
 
 본 stage는 **두 페이지**를 publish한다:
 1. "데이터 흐름도" (parent)
@@ -42,6 +44,8 @@ user-invocable: false
 ### 3.2 통신 명세서 작성
 
 `references/comm-spec-template.md`를 직접 따른다.
+
+**Swagger 스펙 URL이 있으면 (선택)** — 사용자에게 묻는다: *"통신 명세서의 근거가 될 Swagger 스펙 URL이 있나요? (없으면 스킵)"*. 있으면 Bash로 실행: `sh ${CLAUDE_PLUGIN_ROOT}/hooks/run-node.sh ${CLAUDE_PLUGIN_ROOT}/hooks/lib/swagger-extract.js "<URL>" [엔드포인트필터…]`. 스펙이 크면 관심 엔드포인트를 물어 필터 인자로 넘긴다. 반환된 endpoint·요청/응답 DTO로 아래 API endpoint 카탈로그(step 2)를 채운다. **WebFetch·"OpenAPI"/OpenAPI 커넥터 등으로 직접 가져오지 말 것 — 사내망 Swagger는 curl(이 헬퍼)로만 닿는다.** curl 실패(접근 불가·인증) 시 헬퍼 stderr를 사용자에게 전달하고 URL만 근거로 남긴다(소프트, 차단 아님). write-code의 API 참조 취득과 동일 헬퍼·동일 규약이다.
 
 1. 채널 정의 — 페이로드 봉투 형식, 인증 정책
 2. API endpoint 카탈로그 — 메타데이터 표(액션 ID/Method/Endpoint/상태/비고, `/<도메인명>/<리소스>` 규약) + 표 아래 endpoint별 Request/Response 코드 블럭
@@ -86,7 +90,7 @@ Request/Response/Payload는 예외 없이 코드 블럭(```json)으로 감싼다
 
 ```
 solution-publish-notion 호출:
-  work: <과제번호>
+  work: <작업번호>
   mode: "dispatch"
   key: "draw-data-flow"
   title: "데이터 흐름도"
@@ -99,7 +103,7 @@ hook이 자동으로 task.json.links['draw-data-flow']['데이터 흐름도'] = 
 
 ```
 solution-publish-notion 호출:
-  work: <과제번호>
+  work: <작업번호>
   mode: "dispatch"
   key: "draw-data-flow"
   title: "통신 명세서"
